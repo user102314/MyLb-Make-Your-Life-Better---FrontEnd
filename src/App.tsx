@@ -13,29 +13,101 @@ import StockList from './pages/StockList';
 import Verify from "./pages/Verify";
 import VerifyEmail from "./pages/VerifyEmail";
 import VerifyIdentity from "./pages/VerifyIdentity";
+import VerifyGoogleAuth from "./pages/VerifyGoogleAuth";
+import RequestAccessKey from "./pages/RequestAccessKey";
+import ModifyProfile from "./pages/ModifyProfile";
+import PasswordChange from "./pages/PasswordChange";
+import Confidentiality from "./pages/Confidentiality";
+import BeginCompanyStock from "./pages/BeginCompanyStock";
+import CreateCompany from "./pages/CreateCompany";
+import CompanyValidation from "./pages/CompanyValidation";
+import EtatFinanceForm from "./pages/EtatFinanceForm";
+import ListComponey from "./pages/ListComponey";
+import CompanyApplication from "./pages/admin/CompanyApplication";
+
+// 🆕 IMPORT DES NOUVELLES PAGES
+import ViewWallet from "./pages/ViewWallet";
+import ViewCards from "./pages/ViewCards";
+import StockDetails from "./pages/StockDetails";
+import StockDetailsMarket from "./pages/Market";
+
+// 🔑 IMPORTS POUR LE DASHBOARD ADMINISTRATEUR
+import AdminDashboardLayout from "./pages/admin/AdminDashboardLayout"; 
+import ViewTransactions from "./pages/ViewTransactions";
+import StatisticsPage from "./pages/StatisticsPage";
+import StockListMarket from "./pages/Market";
+import StockWallet from "./pages/StockWallet";
+import ChatSupport from "./pages/ChatSupport";
+
+// 🚨 PLACEHOLDERS TEMPORAIRES (à remplacer lorsque vous créez les pages ci-dessus)
+const AdminOverview = () => <div className="p-6 text-xl">Bienvenue sur le Tableau de Bord Admin (A faire)</div>;
+const AdminUserManagement = () => <div className="p-6 text-xl">Gestion des Utilisateurs (A faire)</div>;
+const AdminCompanyValidation = () => <div className="p-6 text-xl">Validation des Sociétés (A faire)</div>;
+const AdminFinanceReports = () => <div className="p-6 text-xl">Rapports Financiers (A faire)</div>;
+const AdminSettings = () => <div className="p-6 text-xl">Paramètres Système (A faire)</div>;
+// -------------------------------------------------------------------------------------------------
+
 const queryClient = new QueryClient();
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index  />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/Sign_up" element={<Sign_up />} />
-          <Route path="/dashboard" element={<DashboardLayout />}> 
-                <Route index element={<StockList />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="stocklist" element={<StockList />} />
-                <Route path="verify" element={<Verify />} />
-                <Route path="verifyemail" element={<VerifyEmail />} />
-                <Route path="VerifyIdentity" element={<VerifyIdentity />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index  />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/Sign_up" element={<Sign_up />} />
+          
+          {/* ------------------------------------------------------------- */}
+          {/* 👤 ROUTES UTILISATEUR STANDARD (DashboardLayout)                 */}
+          {/* ------------------------------------------------------------- */}
+          <Route path="/dashboard" element={<DashboardLayout />}> 
+             <Route index element={<StockList />} />
+             <Route path="profile" element={<Profile />} />
+             <Route path="Editprofile" element={<ModifyProfile />} />
+             <Route path="PasswordChange" element={<PasswordChange />} />
+             <Route path="Confidentiality" element={<Confidentiality />} />
+             <Route path="stocklist" element={<StockList />} />
+             <Route path="verify" element={<Verify />} />
+             <Route path="verifyemail" element={<VerifyEmail />} />
+             <Route path="VerifyIdentity" element={<VerifyIdentity />} />
+             <Route path="VerifyGoogleAuth" element={<VerifyGoogleAuth />} />
+             <Route path="RequestAccessKey" element={<RequestAccessKey />} />
+             <Route path="BeginCompanyStock" element={<BeginCompanyStock />} />
+             <Route path="CreateCompany" element={<CreateCompany />} />
+             <Route path="CompanyValidation" element={<CompanyValidation />} />
+             <Route path="EtatFinanceForm" element={<EtatFinanceForm />} />
+             <Route path="ListComponey" element={<ListComponey />} />
+             <Route path="stock-details" element={<StockDetails />} />
+             <Route path="Transactions" element={<ViewTransactions />} />
+             <Route path="statistique" element={<StatisticsPage />} />
+             <Route path="StockWallet" element={<StockWallet />} />
+            <Route path="support" element={<ChatSupport />} />
+             <Route path="market" element={<StockListMarket />} />
+             <Route path="wallet" element={<ViewWallet />} />
+             <Route path="cards" element={<ViewCards />} />
+          </Route>
+          
+          {/* ------------------------------------------------------------- */}
+          {/* 👑 ROUTES ADMINISTRATEUR (AdminDashboardLayout)                 */}
+          {/* ------------------------------------------------------------- */}
+          <Route path="/admin" element={<AdminDashboardLayout />}>
+             <Route index element={<AdminOverview />} /> {/* /admin/ */}
+             <Route path="dashboard" element={<AdminOverview />} />
+             <Route path="users" element={<AdminUserManagement />} />
+             <Route path="company-application" element={<CompanyApplication />} />
+             <Route path="finance" element={<AdminFinanceReports />} />
+             <Route path="settings" element={<AdminSettings />} />
+          </Route>
+
+          {/* ------------------------------------------------------------- */}
+          {/* 🛑 ROUTE PAR DÉFAUT (404)                                        */}
+          {/* ------------------------------------------------------------- */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
 );
 export default App;

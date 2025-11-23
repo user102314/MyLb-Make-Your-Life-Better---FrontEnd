@@ -2,15 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Upload, Save, CheckCircle } from 'lucide-react'; 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // URL de base de votre API Spring Boot
 const API_BASE_URL = 'http://localhost:9090'; 
 
 const VerifyEmail: React.FC = () => {
+    const navigate = useNavigate();
+    
     // États pour le flux
-    const [kycAccepted, setKycAccepted] = useState(false); // Accepter les conditions
-    const [kycSubmitted, setKycSubmitted] = useState(false); // Soumission réussie
+    const [kycAccepted, setKycAccepted] = useState(false);
+    const [kycSubmitted, setKycSubmitted] = useState(false);
     
     const [userEmail, setUserEmail] = useState('Chargement de l\'email...'); 
     
@@ -23,10 +25,21 @@ const VerifyEmail: React.FC = () => {
     const [message, setMessage] = useState('Veuillez accepter les conditions pour commencer la vérification d\'identité.');
     const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
 
-    // Références pour les inputs de fichiers (pour déclencher le clic)
+    // Références pour les inputs de fichiers
     const refRecto = useRef<HTMLInputElement>(null);
     const refVerso = useRef<HTMLInputElement>(null);
     const refSelfie = useRef<HTMLInputElement>(null);
+
+    // Redirection automatique après succès
+    useEffect(() => {
+        if (kycSubmitted) {
+            const timer = setTimeout(() => {
+                navigate('/dashboard/verify');
+            }, 5000); // Redirection après 5 secondes (plus long car KYC)
+            
+            return () => clearTimeout(timer);
+        }
+    }, [kycSubmitted, navigate]);
 
     useEffect(() => {
         const emailFromStorage = localStorage.getItem('user_connected_email'); 
@@ -60,16 +73,15 @@ const VerifyEmail: React.FC = () => {
             const response = await fetch(`${API_BASE_URL}/api/kyc/upload-documents`, {
                 method: 'POST',
                 body: formData, 
-                // 🚨 CRITIQUE: Assure l'envoi du cookie JSESSIONID
                 credentials: 'include', 
             });
 
             const data = await response.json();
 
             if (response.ok && data.success) {
-                setMessage('Documents soumis avec succès. Merci de bien vouloir attendre la validation de notre équipe de support.');
+                setMessage('✅ Documents soumis avec succès. Redirection vers la page de vérification dans 5 secondes...');
                 setIsSuccess(true);
-                setKycSubmitted(true); 
+                setKycSubmitted(true);
             } else {
                 setMessage(data.message || data.error || 'Erreur lors de la soumission des documents. Veuillez réessayer.');
                 setIsSuccess(false);
@@ -122,9 +134,10 @@ const VerifyEmail: React.FC = () => {
     return (
         <div className="w-full max-w-2xl mx-auto p-4 pt-8"> 
             
-            <Link to="/dashboard" className="flex items-center text-blue-400 hover:text-blue-300 mb-6">
+            {/* Le lien de retour en haut de page renvoie au Dashboard pour toutes les phases */}
+            <Link to="/dashboard/verify" className="flex items-center text-blue-400 hover:text-blue-300 mb-6">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour au tableau de bord
+                Retour aux étapes de vérification
             </Link>
 
             <div className="bg-gray-900 p-8 rounded-xl shadow-lg border border-blue-600/50">
@@ -133,32 +146,44 @@ const VerifyEmail: React.FC = () => {
                     Compte utilisateur : <strong className="text-white">{userEmail}</strong>
                 </p>
 
-                {/* Affichage du Statut */}
-                {message && (
-                    <div className={`mb-6 p-4 rounded-md text-sm border ${messageClasses}`}>
-                        {message}
-                    </div>
-                )}
-
                 {/* --- LOGIQUE D'AFFICHAGE --- */}
                 {kycSubmitted ? (
-                    // --- ÉCRAN DE SUCCÈS ---
+                    // 1. ÉCRAN DE SUCCÈS AVEC REDIRECTION AUTOMATIQUE
                     <div className="text-center p-10 bg-gray-800 rounded-lg">
                         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                         <h2 className="text-2xl font-bold text-green-300 mb-3">Soumission Complétée !</h2>
-                        <p className="text-lg text-gray-400">
-                           Merci de bien vouloir **attendre la validation** de notre équipe de support.
+                        <p className="text-lg text-gray-400 mb-4">
+                            {message}
                         </p>
-                        <Link to="/dashboard" className="mt-6 inline-block py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-                            Aller au Tableau de Bord
-                        </Link>
+                        
+                        {/* Barre de progression pour la redirection */}
+                        <div className="w-full bg-gray-700 rounded-full h-2 mt-4 mb-4">
+                            <div className="bg-green-600 h-2 rounded-full animate-pulse"></div>
+                        </div>
+                        
+                        <p className="text-sm text-gray-500 mb-4">
+                            Redirection automatique vers la page de vérification...
+                        </p>
+                        
+                        {/* Bouton de retour manuel */}
+                        <button
+                            onClick={() => navigate('/dashboard/verify')}
+                            className="mt-4 py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                        >
+                            Retourner maintenant aux étapes
+                        </button>
                     </div>
 
                 ) : (
-                    // --- ÉCRAN D'ACCEPTATION / FORMULAIRE ---
+                    // 2. ÉCRAN D'ACCEPTATION / FORMULAIRE
                     <>
+                        {/* Affichage du Statut du KYC (Erreur ou Avant l'envoi) */}
+                        <div className={`mb-6 p-4 rounded-md text-sm border ${messageClasses}`}>
+                            {message}
+                        </div>
+                        
                         {!kycAccepted ? (
-                            // Écran d'accueil/Acceptation
+                            // 2a. Écran d'accueil/Acceptation
                             <div className="text-center">
                                  <p className="text-gray-400 mb-6">
                                     Veuillez accepter les termes pour soumettre les documents d'identification requis.
@@ -176,7 +201,7 @@ const VerifyEmail: React.FC = () => {
                             </div>
 
                         ) : (
-                            // Écran de Formulaire KYC
+                            // 2b. Écran de Formulaire KYC
                             <div className="space-y-6">
                                 <h2 className="text-2xl font-semibold text-white border-b border-gray-700 pb-2">Documents Requis</h2>
                                 

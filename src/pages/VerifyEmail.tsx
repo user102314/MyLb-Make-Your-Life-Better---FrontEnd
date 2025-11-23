@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // URL de base de votre API Spring Boot
 const API_BASE_URL = 'http://localhost:9090/api/email';
 
 const VerifyEmail: React.FC = () => {
+    const navigate = useNavigate();
+    
     // État pour le code saisi par l'utilisateur
     const [verificationCode, setVerificationCode] = useState('');
     
@@ -17,6 +19,7 @@ const VerifyEmail: React.FC = () => {
     // État pour les messages de statut (succès ou erreur)
     const [message, setMessage] = useState('Veuillez cliquer pour obtenir votre code.');
     const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
+    const [isVerified, setIsVerified] = useState(false);
 
     // 💡 Récupération simulée de l'email de l'utilisateur connecté pour l'affichage
     useEffect(() => {
@@ -30,6 +33,16 @@ const VerifyEmail: React.FC = () => {
         }
     }, []);
 
+    // Redirection automatique après succès
+    useEffect(() => {
+        if (isVerified) {
+            const timer = setTimeout(() => {
+                navigate('/dashboard/verify');
+            }, 3000); // Redirection après 3 secondes
+            
+            return () => clearTimeout(timer);
+        }
+    }, [isVerified, navigate]);
 
     // Fonction pour consommer l'API d'envoi de code
     const handleSendCode = async () => {
@@ -90,16 +103,22 @@ const VerifyEmail: React.FC = () => {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                setMessage(data.message || 'Félicitations, votre email est vérifié !');
+                setMessage(data.message || 'Félicitations, votre email est vérifié ! Redirection dans 3 secondes...');
                 setIsSuccess(true);
+                setIsVerified(true);
+                
+                // Réinitialiser le champ de code
+                setVerificationCode('');
             } else {
                 setMessage(data.message || 'Code invalide ou expiré. Veuillez réessayer.');
                 setIsSuccess(false);
+                setIsVerified(false);
             }
         } catch (error) {
             console.error("Erreur réseau:", error);
             setMessage('Erreur de connexion au serveur lors de la vérification.');
             setIsSuccess(false);
+            setIsVerified(false);
         }
     };
 
@@ -128,41 +147,65 @@ const VerifyEmail: React.FC = () => {
                     <button
                         onClick={handleSendCode}
                         className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150"
+                        disabled={isVerified}
                     >
-                        Obtenir un Code de Vérification
+                        {isVerified ? 'Email Vérifié ✓' : 'Obtenir un Code de Vérification'}
                     </button>
                     <p className="text-sm text-gray-500 mt-2 text-center">
-                        Cliquez ci-dessus pour recevoir votre code par email.
+                        {isVerified ? 'Votre email a été vérifié avec succès !' : 'Cliquez ci-dessus pour recevoir votre code par email.'}
                     </p>
                 </div>
                 
                 {/* Section de vérification de code */}
-                <div className="flex flex-col space-y-4">
-                    <label htmlFor="code" className="text-lg font-medium text-gray-700">
-                        Entrez le Code Reçu (6 chiffres) :
-                    </label>
-                    <input
-                        id="code"
-                        type="text"
-                        maxLength={6}
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value)}
-                        className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-center text-xl tracking-widest"
-                        placeholder="______"
-                    />
-                    <button
-                        onClick={handleVerifyCode}
-                        className="w-full py-3 px-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 disabled:bg-gray-400"
-                        disabled={verificationCode.length !== 6}
-                    >
-                        Vérifier le Code
-                    </button>
-                </div>
+                {!isVerified && (
+                    <div className="flex flex-col space-y-4">
+                        <label htmlFor="code" className="text-lg font-medium text-gray-700">
+                            Entrez le Code Reçu (6 chiffres) :
+                        </label>
+                        <input
+                            id="code"
+                            type="text"
+                            maxLength={6}
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))} // N'autorise que les chiffres
+                            className="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-center text-xl tracking-widest"
+                            placeholder="______"
+                            disabled={isVerified}
+                        />
+                        <button
+                            onClick={handleVerifyCode}
+                            className="w-full py-3 px-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-150 disabled:bg-gray-400"
+                            disabled={verificationCode.length !== 6 || isVerified}
+                        >
+                            {isVerified ? 'Vérifié ✓' : 'Vérifier le Code'}
+                        </button>
+                    </div>
+                )}
 
                 {/* Affichage du Statut */}
                 {message && (
                     <div className={`mt-6 p-4 rounded-md text-sm border ${messageClasses}`}>
                         {message}
+                        {isVerified && (
+                            <div className="mt-2 text-sm">
+                                <p>✅ Redirection automatique vers la page de vérification...</p>
+                                <div className="w-full bg-green-200 rounded-full h-2 mt-2">
+                                    <div className="bg-green-600 h-2 rounded-full animate-pulse"></div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Bouton de retour manuel si l'utilisateur ne veut pas attendre */}
+                {isVerified && (
+                    <div className="mt-4 text-center">
+                        <button
+                            onClick={() => navigate('/dashboard/verify')}
+                            className="text-blue-600 hover:text-blue-800 underline text-sm"
+                        >
+                            Retourner maintenant à la page de vérification
+                        </button>
                     </div>
                 )}
             </div>
