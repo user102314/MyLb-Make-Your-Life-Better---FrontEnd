@@ -201,8 +201,8 @@ const StockListMarket: React.FC = () => {
   // Obtenir l'icône de tendance
   const getTrendIcon = (change: number) => {
     return change >= 0 ? 
-      <TrendingUp className="w-4 h-4" /> : 
-      <TrendingDown className="w-4 h-4" />;
+      <TrendingUp className="w-4 h-4 text-green-400" /> : 
+      <TrendingDown className="w-4 h-4 text-red-400" />;
   };
 
   // Filtrer et trier les stocks
@@ -296,9 +296,9 @@ const StockListMarket: React.FC = () => {
 
   if (loading && stocks.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-purple-900/20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p className="text-white text-lg">Chargement des stocks...</p>
         </div>
       </div>
@@ -306,132 +306,132 @@ const StockListMarket: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-900/20 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Marché des Stocks</h1>
-          <p className="text-slate-300">Surveillez tous vos stocks en temps réel</p>
+          <p className="text-purple-300">Surveillez tous vos stocks en temps réel</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar - Statistiques et Filtres */}
           <div className="space-y-6">
             {/* Statistiques Globales */}
-            <Card className="bg-gradient-to-br from-blue-600 to-purple-700 border-0 text-white shadow-2xl">
+            <Card className="bg-gradient-to-br from-purple-600 to-purple-800 border-0 text-white shadow-2xl">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <Badge variant="secondary" className="bg-white/20 text-white border-0 mb-2">
+                    <Badge variant="secondary" className="bg-purple-500/20 text-white border-purple-400 mb-2">
                       Marché Global
                     </Badge>
-                    <p className="text-blue-200 text-sm">Performance Totale</p>
+                    <p className="text-purple-200 text-sm">Performance Totale</p>
                   </div>
-                  <BarChart3 className="w-6 h-6 text-white/80" />
+                  <BarChart3 className="w-6 h-6 text-purple-300" />
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-200">Total Stocks</span>
+                    <span className="text-purple-200">Total Stocks</span>
                     <span className="text-white font-bold">{globalStats.totalStocks}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-200">Stocks Actifs</span>
+                    <span className="text-purple-200">Stocks Actifs</span>
                     <span className="text-green-400 font-bold">{globalStats.activeStocks}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-200">Prix Moyen</span>
+                    <span className="text-purple-200">Prix Moyen</span>
                     <span className="text-white font-bold">{formatPrice(globalStats.avgPrice)} €</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-200">Change Moyen</span>
+                    <span className="text-purple-200">Change Moyen</span>
                     <span className={`font-bold ${getPriceColor(globalStats.avgChange)}`}>
                       {globalStats.avgChange >= 0 ? '+' : ''}{globalStats.avgChange.toFixed(2)}%
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/20">
+                <div className="mt-4 pt-3 border-t border-purple-400/20">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-blue-200">Dernière mise à jour</span>
-                    <span className="text-white/80">{lastUpdate.toLocaleTimeString('fr-FR')}</span>
+                    <span className="text-purple-200">Dernière mise à jour</span>
+                    <span className="text-purple-300">{lastUpdate.toLocaleTimeString('fr-FR')}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Filtres */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Filter className="w-5 h-5" />
+                  <Filter className="w-5 h-5 text-purple-400" />
                   Filtres
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Recherche */}
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Recherche</Label>
+                  <Label className="text-purple-300">Recherche</Label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 w-4 h-4" />
                     <Input
                       placeholder="Rechercher un stock..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 bg-slate-700 border-slate-600 text-white"
+                      className="pl-10 bg-gray-700 border-purple-500/30 text-white focus:border-purple-500"
                     />
                   </div>
                 </div>
 
                 {/* Statut */}
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Statut</Label>
+                  <Label className="text-purple-300">Statut</Label>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-gray-700 border-purple-500/30 text-white focus:border-purple-500">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">Tous les statuts</SelectItem>
-                      <SelectItem value="ACTIVE">Actif</SelectItem>
-                      <SelectItem value="INACTIVE">Inactif</SelectItem>
-                      <SelectItem value="SUSPENDED">Suspendu</SelectItem>
+                    <SelectContent className="bg-gray-800 border-purple-500/30">
+                      <SelectItem value="ALL" className="text-white hover:bg-purple-500/20">Tous les statuts</SelectItem>
+                      <SelectItem value="ACTIVE" className="text-white hover:bg-purple-500/20">Actif</SelectItem>
+                      <SelectItem value="INACTIVE" className="text-white hover:bg-purple-500/20">Inactif</SelectItem>
+                      <SelectItem value="SUSPENDED" className="text-white hover:bg-purple-500/20">Suspendu</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Fourchette de prix */}
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Fourchette de prix</Label>
+                  <Label className="text-purple-300">Fourchette de prix</Label>
                   <Select value={priceRange} onValueChange={setPriceRange}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-gray-700 border-purple-500/30 text-white focus:border-purple-500">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ALL">Tous les prix</SelectItem>
-                      <SelectItem value="UNDER_10">Moins de 10€</SelectItem>
-                      <SelectItem value="10_50">10€ - 50€</SelectItem>
-                      <SelectItem value="50_100">50€ - 100€</SelectItem>
-                      <SelectItem value="OVER_100">Plus de 100€</SelectItem>
+                    <SelectContent className="bg-gray-800 border-purple-500/30">
+                      <SelectItem value="ALL" className="text-white hover:bg-purple-500/20">Tous les prix</SelectItem>
+                      <SelectItem value="UNDER_10" className="text-white hover:bg-purple-500/20">Moins de 10€</SelectItem>
+                      <SelectItem value="10_50" className="text-white hover:bg-purple-500/20">10€ - 50€</SelectItem>
+                      <SelectItem value="50_100" className="text-white hover:bg-purple-500/20">50€ - 100€</SelectItem>
+                      <SelectItem value="OVER_100" className="text-white hover:bg-purple-500/20">Plus de 100€</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Tri */}
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Trier par</Label>
+                  <Label className="text-purple-300">Trier par</Label>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="bg-gray-700 border-purple-500/30 text-white focus:border-purple-500">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="NAME_ASC">Nom (A-Z)</SelectItem>
-                      <SelectItem value="NAME_DESC">Nom (Z-A)</SelectItem>
-                      <SelectItem value="PRICE_ASC">Prix (Croissant)</SelectItem>
-                      <SelectItem value="PRICE_DESC">Prix (Décroissant)</SelectItem>
-                      <SelectItem value="CHANGE_ASC">Change (Croissant)</SelectItem>
-                      <SelectItem value="CHANGE_DESC">Change (Décroissant)</SelectItem>
-                      <SelectItem value="VOLUME_ASC">Volume (Croissant)</SelectItem>
-                      <SelectItem value="VOLUME_DESC">Volume (Décroissant)</SelectItem>
+                    <SelectContent className="bg-gray-800 border-purple-500/30">
+                      <SelectItem value="NAME_ASC" className="text-white hover:bg-purple-500/20">Nom (A-Z)</SelectItem>
+                      <SelectItem value="NAME_DESC" className="text-white hover:bg-purple-500/20">Nom (Z-A)</SelectItem>
+                      <SelectItem value="PRICE_ASC" className="text-white hover:bg-purple-500/20">Prix (Croissant)</SelectItem>
+                      <SelectItem value="PRICE_DESC" className="text-white hover:bg-purple-500/20">Prix (Décroissant)</SelectItem>
+                      <SelectItem value="CHANGE_ASC" className="text-white hover:bg-purple-500/20">Change (Croissant)</SelectItem>
+                      <SelectItem value="CHANGE_DESC" className="text-white hover:bg-purple-500/20">Change (Décroissant)</SelectItem>
+                      <SelectItem value="VOLUME_ASC" className="text-white hover:bg-purple-500/20">Volume (Croissant)</SelectItem>
+                      <SelectItem value="VOLUME_DESC" className="text-white hover:bg-purple-500/20">Volume (Décroissant)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -440,7 +440,7 @@ const StockListMarket: React.FC = () => {
                 <div className="flex gap-2 pt-2">
                   <Button 
                     variant="outline" 
-                    className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="flex-1 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-500"
                     onClick={() => {
                       setSearchTerm('');
                       setStatusFilter('ALL');
@@ -452,34 +452,38 @@ const StockListMarket: React.FC = () => {
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:border-purple-500"
                     onClick={fetchAllData}
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className="w-4 h-4 text-purple-400" />
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Contrôles Auto-refresh */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
               <CardHeader>
-                <CardTitle className="text-white text-lg">Contrôles Temps Réel</CardTitle>
+                <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-purple-400" />
+                  Contrôles Temps Réel
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-slate-300">Auto-refresh</Label>
+                    <Label className="text-purple-300">Auto-refresh</Label>
                     <Button
                       variant={autoRefresh ? "default" : "outline"}
                       size="sm"
+                      className={autoRefresh ? "bg-purple-600 hover:bg-purple-700" : "border-purple-500 text-purple-400 hover:bg-purple-500/20"}
                       onClick={() => setAutoRefresh(!autoRefresh)}
                     >
                       <RefreshCw className={`w-4 h-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
                       {autoRefresh ? 'Activé' : 'Désactivé'}
                     </Button>
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-purple-400">
                     {autoRefresh 
                       ? 'Mise à jour automatique toutes les 10 secondes' 
                       : 'Mise à jour manuelle uniquement'
@@ -493,28 +497,28 @@ const StockListMarket: React.FC = () => {
           {/* Contenu principal */}
           <div className="lg:col-span-3">
             <Tabs defaultValue="all" className="space-y-6">
-              <TabsList className="bg-slate-800 border border-slate-700">
-                <TabsTrigger value="all" className="text-slate-300 data-[state=active]:bg-slate-700">
-                  <Building className="w-4 h-4 mr-2" />
+              <TabsList className="bg-gray-800/90 backdrop-blur-xl border border-purple-500/30">
+                <TabsTrigger value="all" className="text-purple-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <Building className="w-4 h-4 mr-2 text-purple-400" />
                   Tous les Stocks ({filteredStocks.length})
                 </TabsTrigger>
-                <TabsTrigger value="active" className="text-slate-300 data-[state=active]:bg-slate-700">
-                  <Activity className="w-4 h-4 mr-2" />
+                <TabsTrigger value="active" className="text-purple-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <Activity className="w-4 h-4 mr-2 text-purple-400" />
                   Stocks Actifs ({stocks.filter(s => s.etat === 'ACTIVE').length})
                 </TabsTrigger>
-                <TabsTrigger value="gainers" className="text-slate-300 data-[state=active]:bg-slate-700">
-                  <TrendingUp className="w-4 h-4 mr-2" />
+                <TabsTrigger value="gainers" className="text-purple-300 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                  <TrendingUp className="w-4 h-4 mr-2 text-purple-400" />
                   Performants ({stocksStats.filter(s => s.statistics.evolution_pourcentage > 0).length})
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="all" className="space-y-4">
                 {filteredStocks.length === 0 ? (
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
                     <CardContent className="text-center py-12">
-                      <BarChart3 className="w-16 h-16 mx-auto mb-4 text-slate-500" />
+                      <BarChart3 className="w-16 h-16 mx-auto mb-4 text-purple-500" />
                       <h3 className="text-xl font-semibold text-white mb-2">Aucun stock trouvé</h3>
-                      <p className="text-slate-400">
+                      <p className="text-purple-400">
                         Aucun stock ne correspond à vos critères de recherche
                       </p>
                     </CardContent>
@@ -532,7 +536,7 @@ const StockListMarket: React.FC = () => {
                       return (
                         <Card 
                           key={stock.idStock} 
-                          className="bg-slate-800 border-slate-700 hover:border-slate-500 transition-all duration-300 cursor-pointer hover:shadow-xl"
+                          className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30 hover:border-purple-500 transition-all duration-300 cursor-pointer hover:shadow-xl"
                           onClick={() => navigate('/dashboard/stock-details', { 
                             state: { 
                               stockId: stock.idStock, 
@@ -546,14 +550,15 @@ const StockListMarket: React.FC = () => {
                                 <CardTitle className="text-white text-lg">
                                   {stock.nomStock}
                                 </CardTitle>
-                                <CardDescription className="text-slate-400 flex items-center gap-2 mt-1">
-                                  <Building className="w-3 h-3" />
+                                <CardDescription className="text-purple-300 flex items-center gap-2 mt-1">
+                                  <Building className="w-3 h-3 text-purple-400" />
                                   Company #{stock.idComponey || 'N/A'}
                                 </CardDescription>
                               </div>
-                              <Badge variant={
-                                stock.etat === 'ACTIVE' ? 'default' :
-                                stock.etat === 'INACTIVE' ? 'secondary' : 'destructive'
+                              <Badge className={
+                                stock.etat === 'ACTIVE' ? 'bg-green-500/20 text-green-400 border-green-400' :
+                                stock.etat === 'INACTIVE' ? 'bg-purple-500/20 text-purple-400 border-purple-400' : 
+                                'bg-red-500/20 text-red-400 border-red-400'
                               }>
                                 {stock.etat === 'ACTIVE' ? 'Actif' :
                                  stock.etat === 'INACTIVE' ? 'Inactif' : 'Suspendu'}
@@ -577,28 +582,28 @@ const StockListMarket: React.FC = () => {
 
                             {/* Statistiques */}
                             <div className="grid grid-cols-2 gap-3 text-sm">
-                              <div className="text-center p-2 bg-slate-700/50 rounded-lg">
+                              <div className="text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
                                 <div className="text-green-400 font-bold">
                                   {formatPrice(maxPrice)}
                                 </div>
-                                <div className="text-slate-400 text-xs">Max</div>
+                                <div className="text-purple-400 text-xs">Max</div>
                               </div>
-                              <div className="text-center p-2 bg-slate-700/50 rounded-lg">
+                              <div className="text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
                                 <div className="text-red-400 font-bold">
                                   {formatPrice(minPrice)}
                                 </div>
-                                <div className="text-slate-400 text-xs">Min</div>
+                                <div className="text-purple-400 text-xs">Min</div>
                               </div>
                             </div>
 
                             {/* Volume et Historique */}
-                            <div className="flex justify-between items-center text-xs text-slate-400">
+                            <div className="flex justify-between items-center text-xs text-purple-400">
                               <div className="flex items-center gap-1">
-                                <DollarSign className="w-3 h-3" />
+                                <DollarSign className="w-3 h-3 text-purple-400" />
                                 Volume: {stock.stockDisponible || 0}
                               </div>
                               <div className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                                <Clock className="w-3 h-3 text-purple-400" />
                                 {history.length} trades
                               </div>
                             </div>
@@ -606,8 +611,7 @@ const StockListMarket: React.FC = () => {
 
                           <CardFooter className="pt-0">
                             <Button 
-                              variant="outline" 
-                              className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                              className="w-full bg-purple-600 hover:bg-purple-700 text-white border-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate('/dashboard/stock-details', { 
@@ -638,10 +642,11 @@ const StockListMarket: React.FC = () => {
                       const change = stats?.statistics?.evolution_pourcentage || 0;
                       
                       return (
-                        <Card key={stock.idStock} className="bg-slate-800 border-slate-700">
+                        <Card key={stock.idStock} className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30 hover:border-purple-500 transition-all duration-300">
                           <CardHeader>
                             <CardTitle className="text-white">{stock.nomStock}</CardTitle>
-                            <CardDescription className="text-slate-400">
+                            <CardDescription className="text-purple-300 flex items-center gap-2">
+                              <Building className="w-3 h-3 text-purple-400" />
                               Company #{stock.idComponey}
                             </CardDescription>
                           </CardHeader>
@@ -679,10 +684,11 @@ const StockListMarket: React.FC = () => {
                       const change = stats?.statistics.evolution_pourcentage || 0;
                       
                       return (
-                        <Card key={stock.idStock} className="bg-slate-800 border-slate-700">
+                        <Card key={stock.idStock} className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30 hover:border-purple-500 transition-all duration-300">
                           <CardHeader>
                             <CardTitle className="text-white">{stock.nomStock}</CardTitle>
-                            <CardDescription className="text-slate-400">
+                            <CardDescription className="text-purple-300 flex items-center gap-2">
+                              <Building className="w-3 h-3 text-purple-400" />
                               Company #{stock.idComponey}
                             </CardDescription>
                           </CardHeader>
@@ -706,38 +712,41 @@ const StockListMarket: React.FC = () => {
 
             {/* Résumé des performances */}
             {stocksStats.length > 0 && (
-              <Card className="bg-slate-800 border-slate-700 mt-6">
+              <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30 mt-6">
                 <CardHeader>
-                  <CardTitle className="text-white">Performances du Marché</CardTitle>
-                  <CardDescription className="text-slate-400">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-400" />
+                    Performances du Marché
+                  </CardTitle>
+                  <CardDescription className="text-purple-300">
                     Aperçu des tendances sur les 7 derniers jours
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-slate-700/50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-500">
+                    <div className="text-center p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="text-2xl font-bold text-green-400">
                         {stocksStats.filter(s => s.statistics.evolution_pourcentage > 0).length}
                       </div>
-                      <div className="text-slate-400 text-sm">Stocks en hausse</div>
+                      <div className="text-purple-400 text-sm">Stocks en hausse</div>
                     </div>
-                    <div className="text-center p-4 bg-slate-700/50 rounded-lg">
-                      <div className="text-2xl font-bold text-red-500">
+                    <div className="text-center p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="text-2xl font-bold text-red-400">
                         {stocksStats.filter(s => s.statistics.evolution_pourcentage < 0).length}
                       </div>
-                      <div className="text-slate-400 text-sm">Stocks en baisse</div>
+                      <div className="text-purple-400 text-sm">Stocks en baisse</div>
                     </div>
-                    <div className="text-center p-4 bg-slate-700/50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-500">
+                    <div className="text-center p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="text-2xl font-bold text-purple-400">
                         {stocksStats.length}
                       </div>
-                      <div className="text-slate-400 text-sm">Stocks suivis</div>
+                      <div className="text-purple-400 text-sm">Stocks suivis</div>
                     </div>
-                    <div className="text-center p-4 bg-slate-700/50 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-500">
+                    <div className="text-center p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <div className="text-2xl font-bold text-yellow-400">
                         {stocksStats.length > 0 ? Math.max(...stocksStats.map(s => s.statistics.evolution_pourcentage)).toFixed(2) : '0.00'}%
                       </div>
-                      <div className="text-slate-400 text-sm">Meilleure performance</div>
+                      <div className="text-purple-400 text-sm">Meilleure performance</div>
                     </div>
                   </div>
                 </CardContent>

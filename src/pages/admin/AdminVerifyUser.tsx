@@ -121,7 +121,7 @@ const AdminVerifyUser: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include' // Important pour les cookies de session
+        credentials: 'include'
       });
 
       console.log('📡 Réponse reçue:', response.status, response.statusText);
@@ -205,7 +205,6 @@ const AdminVerifyUser: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        // Mettre à jour la liste locale
         setUsers(prevUsers => 
           prevUsers.map(user => 
             user.clientId === userId ? { ...user, role: newRole } : user
@@ -250,7 +249,6 @@ const AdminVerifyUser: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
-        // Mettre à jour la liste locale
         setUsers(prevUsers => 
           prevUsers.map(user => 
             user.clientId === userId ? { ...user, isVerified } : user
@@ -337,16 +335,16 @@ const AdminVerifyUser: React.FC = () => {
 
   const getVerificationBadge = (user: User) => {
     if (user.isFullyVerified) {
-      return <Badge className="bg-green-100 text-green-700 flex items-center gap-1">
+      return <Badge className="bg-green-500/20 text-green-400 border-green-400 flex items-center gap-1">
         <CheckCircle className="w-3 h-3" />
         Complètement Vérifié
       </Badge>;
     } else if (user.hasIdentityDocuments) {
-      return <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+      return <Badge className="bg-purple-500/20 text-purple-400 border-purple-400">
         En Attente
       </Badge>;
     } else {
-      return <Badge variant="outline" className="text-gray-500">
+      return <Badge className="bg-red-500/20 text-red-400 border-red-400">
         Non Soumis
       </Badge>;
     }
@@ -355,13 +353,13 @@ const AdminVerifyUser: React.FC = () => {
   const getIdentityStatusBadge = (status: string) => {
     switch (status) {
       case 'VALIDATED':
-        return <Badge className="bg-green-100 text-green-700">Validé</Badge>;
+        return <Badge className="bg-green-500/20 text-green-400 border-green-400">Validé</Badge>;
       case 'PENDING':
-        return <Badge className="bg-yellow-100 text-yellow-700">En Attente</Badge>;
+        return <Badge className="bg-purple-500/20 text-purple-400 border-purple-400">En Attente</Badge>;
       case 'REJECTED':
-        return <Badge className="bg-red-100 text-red-700">Rejeté</Badge>;
+        return <Badge className="bg-red-500/20 text-red-400 border-red-400">Rejeté</Badge>;
       default:
-        return <Badge variant="outline">Inconnu</Badge>;
+        return <Badge className="bg-purple-500/20 text-purple-400 border-purple-400">Inconnu</Badge>;
     }
   };
 
@@ -389,11 +387,11 @@ const AdminVerifyUser: React.FC = () => {
 
   if (error && users.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      <div className="min-h-screen bg-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           <ErrorAlert error={error} onRetry={handleRefresh} />
           <div className="mt-4 text-center">
-            <Button onClick={testConnection} variant="outline">
+            <Button onClick={testConnection} variant="outline" className="bg-gray-800 border-purple-500 text-white hover:bg-purple-500/10">
               Tester la connexion
             </Button>
           </div>
@@ -403,20 +401,24 @@ const AdminVerifyUser: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6">
+    <div className="min-h-screen bg-gray-900 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
-          <div>
+          <div className="bg-gray-800 border border-purple-500/20 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-2">
-              <UserCheck className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">
-                Vérification des Utilisateurs
-              </h1>
+              <div className="p-2 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800">
+                <UserCheck className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">
+                  Vérification des Utilisateurs
+                </h1>
+                <p className="text-gray-400">
+                  Gestion et validation des comptes utilisateurs et documents d'identité
+                </p>
+              </div>
             </div>
-            <p className="text-gray-600">
-              Gestion et validation des comptes utilisateurs et documents d'identité
-            </p>
           </div>
           
           <div className="flex gap-3">
@@ -424,12 +426,12 @@ const AdminVerifyUser: React.FC = () => {
               onClick={handleRefresh}
               disabled={refreshing}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-gray-800 border-purple-500 text-white hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-200"
             >
               {refreshing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-purple-400" />
               ) : (
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4 text-purple-400" />
               )}
               Actualiser
             </Button>
@@ -437,9 +439,9 @@ const AdminVerifyUser: React.FC = () => {
         </div>
 
         {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+          <Alert variant="destructive" className="bg-red-500/10 border-red-400 mb-6">
+            <AlertCircle className="h-4 w-4 text-red-400" />
+            <AlertDescription className="text-red-400">{error}</AlertDescription>
           </Alert>
         )}
 
@@ -447,25 +449,25 @@ const AdminVerifyUser: React.FC = () => {
         {viewMode === 'list' && (
           <div className="space-y-6">
             {/* Filtres et Recherche */}
-            <Card>
+            <Card className="bg-gray-800 border-purple-500/20">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-400 w-4 h-4" />
                     <Input
                       placeholder="Rechercher par nom, email ou CIN..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-gray-700 border-purple-500/20 text-white focus:border-purple-500 placeholder:text-gray-400"
                     />
                   </div>
                   
                   <Select value={filterVerified} onValueChange={(value: 'all' | 'verified' | 'unverified') => setFilterVerified(value)}>
-                    <SelectTrigger className="w-[180px]">
-                      <Filter className="w-4 h-4 mr-2" />
+                    <SelectTrigger className="w-[180px] bg-gray-700 border-purple-500/20 text-white focus:border-purple-500">
+                      <Filter className="w-4 h-4 mr-2 text-purple-400" />
                       <SelectValue placeholder="Filtrer par statut" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-800 border-purple-500/20 text-white">
                       <SelectItem value="all">Tous les utilisateurs</SelectItem>
                       <SelectItem value="verified">Vérifiés complets</SelectItem>
                       <SelectItem value="unverified">Non vérifiés</SelectItem>
@@ -481,7 +483,7 @@ const AdminVerifyUser: React.FC = () => {
                 title="Total Utilisateurs"
                 value={users.length.toString()}
                 icon={<Users className="w-6 h-6" />}
-                color="blue"
+                color="purple"
               />
               <StatCard
                 title="Complètement Vérifiés"
@@ -493,7 +495,7 @@ const AdminVerifyUser: React.FC = () => {
                 title="En Attente"
                 value={users.filter(u => u.hasIdentityDocuments && !u.isFullyVerified).length.toString()}
                 icon={<FileText className="w-6 h-6" />}
-                color="yellow"
+                color="purple"
               />
               <StatCard
                 title="Non Soumis"
@@ -504,10 +506,10 @@ const AdminVerifyUser: React.FC = () => {
             </div>
 
             {/* Liste des Utilisateurs */}
-            <Card>
+            <Card className="bg-gray-800 border-purple-500/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-6 h-6" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Users className="w-6 h-6 text-purple-400" />
                   Liste des Utilisateurs ({filteredUsers.length})
                 </CardTitle>
               </CardHeader>
@@ -523,8 +525,8 @@ const AdminVerifyUser: React.FC = () => {
                   ))}
                   
                   {filteredUsers.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <div className="text-center py-8 text-gray-400 bg-purple-500/10 rounded-xl border border-purple-500/20">
+                      <Users className="w-16 h-16 mx-auto mb-4 text-purple-400/40" />
                       <p>Aucun utilisateur trouvé</p>
                     </div>
                   )}
@@ -559,49 +561,38 @@ const AdminVerifyUser: React.FC = () => {
   );
 };
 
-
- 
-
-
-
-
-
-
-
-
-
 const UserCard: React.FC<{
   user: User;
   onViewDetails: () => void;
   getVerificationBadge: (user: User) => React.ReactNode;
 }> = ({ user, onViewDetails, getVerificationBadge }) => {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="bg-gray-800 border-purple-500/20 hover:border-purple-500 transition-all duration-200">
       <CardContent className="p-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 {user.firstName} {user.lastName}
               </h3>
               {getVerificationBadge(user)}
-              <Badge variant={user.isVerified ? "default" : "outline"}>
+              <Badge className={user.isVerified ? "bg-green-500/20 text-green-400 border-green-400" : "bg-purple-500/20 text-purple-400 border-purple-400"}>
                 {user.isVerified ? "Vérifié" : "Non Vérifié"}
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-400">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
+                <Mail className="w-4 h-4 text-purple-400" />
                 <span>{user.email}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
+                <Shield className="w-4 h-4 text-purple-400" />
                 <span>Rôle: {user.role}</span>
               </div>
               {user.cinNumber && (
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
+                  <FileText className="w-4 h-4 text-purple-400" />
                   <span>CIN: {user.cinNumber}</span>
                 </div>
               )}
@@ -611,8 +602,7 @@ const UserCard: React.FC<{
           <div className="flex gap-2">
             <Button
               onClick={onViewDetails}
-              variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white transition-all duration-200"
             >
               <Eye className="w-4 h-4" />
               Voir Détails
@@ -674,19 +664,19 @@ const UserDetailsView: React.FC<{
           <Button
             onClick={onBack}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-gray-800 border-purple-500 text-white hover:bg-purple-500/10 hover:border-purple-400"
           >
-            <ChevronUp className="w-4 h-4" />
+            <ChevronUp className="w-4 h-4 text-purple-400" />
             Retour à la liste
           </Button>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-white">
             Détails de {user.firstName} {user.lastName}
           </h2>
         </div>
         
         <div className="flex gap-2">
           {getIdentityStatusBadge(user.identityStatus)}
-          <Badge variant={user.isVerified ? "default" : "outline"}>
+          <Badge className={user.isVerified ? "bg-green-500/20 text-green-400 border-green-400" : "bg-purple-500/20 text-purple-400 border-purple-400"}>
             {user.isVerified ? "Compte Vérifié" : "Compte Non Vérifié"}
           </Badge>
         </div>
@@ -694,10 +684,10 @@ const UserDetailsView: React.FC<{
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Informations Personnelles */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-gray-800 border-purple-500/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserCheck className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <UserCheck className="w-5 h-5 text-purple-400" />
               Informations Personnelles
             </CardTitle>
           </CardHeader>
@@ -715,21 +705,21 @@ const UserDetailsView: React.FC<{
         </Card>
 
         {/* Actions Administrateur */}
-        <Card>
+        <Card className="bg-gray-800 border-purple-500/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Shield className="w-5 h-5 text-purple-400" />
               Actions Administrateur
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Rôle Utilisateur</label>
+              <label className="text-sm font-medium text-gray-300">Rôle Utilisateur</label>
               <Select value={user.role} onValueChange={handleRoleChange} disabled={updating}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-gray-700 border-purple-500/20 text-white focus:border-purple-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-purple-500/20 text-white">
                   <SelectItem value="USER">Utilisateur</SelectItem>
                   <SelectItem value="ADMIN">Administrateur</SelectItem>
                   <SelectItem value="MODERATOR">Modérateur</SelectItem>
@@ -738,16 +728,16 @@ const UserDetailsView: React.FC<{
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Statut du Compte</label>
+              <label className="text-sm font-medium text-gray-300">Statut du Compte</label>
               <Select 
                 value={user.isVerified ? "verified" : "unverified"} 
                 onValueChange={(value) => handleVerificationChange(value === "verified")}
                 disabled={updating}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-gray-700 border-purple-500/20 text-white focus:border-purple-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-purple-500/20 text-white">
                   <SelectItem value="verified">Vérifié</SelectItem>
                   <SelectItem value="unverified">Non Vérifié</SelectItem>
                 </SelectContent>
@@ -755,16 +745,16 @@ const UserDetailsView: React.FC<{
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Statut des Documents</label>
+              <label className="text-sm font-medium text-gray-300">Statut des Documents</label>
               <Select 
                 value={user.identityStatus} 
                 onValueChange={handleIdentityStatusChange}
                 disabled={updating}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-gray-700 border-purple-500/20 text-white focus:border-purple-500">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-purple-500/20 text-white">
                   <SelectItem value="PENDING">En Attente</SelectItem>
                   <SelectItem value="VALIDATED">Validé</SelectItem>
                   <SelectItem value="REJECTED">Rejeté</SelectItem>
@@ -775,13 +765,13 @@ const UserDetailsView: React.FC<{
         </Card>
 
         {/* Documents d'Identité */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 bg-gray-800 border-purple-500/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <FileText className="w-5 h-5 text-purple-400" />
               Documents d'Identité
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-gray-400">
               Documents soumis par l'utilisateur pour vérification
             </CardDescription>
           </CardHeader>
@@ -807,10 +797,10 @@ const UserDetailsView: React.FC<{
         </Card>
 
         {/* État de Vérification */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 bg-gray-800 border-purple-500/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <CheckCircle className="w-5 h-5 text-purple-400" />
               État de Vérification
             </CardTitle>
           </CardHeader>
@@ -838,10 +828,10 @@ const UserDetailsView: React.FC<{
               />
             </div>
             
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-6 p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
               <div className="flex items-center justify-between">
-                <span className="font-semibold">Statut Global:</span>
-                <Badge className={user.fullyVerified ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
+                <span className="font-semibold text-white">Statut Global:</span>
+                <Badge className={user.fullyVerified ? "bg-green-500/20 text-green-400 border-green-400" : "bg-purple-500/20 text-purple-400 border-purple-400"}>
                   {user.fullyVerified ? "COMPLÈTEMENT VÉRIFIÉ" : "EN COURS DE VÉRIFICATION"}
                 </Badge>
               </div>
@@ -857,21 +847,20 @@ const UserDetailsView: React.FC<{
 const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; color: string }> = 
   ({ title, value, icon, color }) => {
   const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    red: 'bg-red-100 text-red-600'
+    purple: 'bg-gradient-to-r from-purple-600 to-purple-800 text-white',
+    green: 'bg-gradient-to-r from-green-600 to-green-800 text-white',
+    red: 'bg-gradient-to-r from-red-600 to-red-800 text-white'
   };
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-purple-500/20 hover:border-purple-500 transition-all duration-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+            <p className="text-sm font-medium text-gray-400">{title}</p>
+            <p className="text-2xl font-bold text-white mt-1">{value}</p>
           </div>
-          <div className={`p-3 rounded-full ${colorClasses[color]}`}>
+          <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
             {icon}
           </div>
         </div>
@@ -882,8 +871,8 @@ const StatCard: React.FC<{ title: string; value: string; icon: React.ReactNode; 
 
 const InfoField: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div>
-    <label className="text-sm font-medium text-gray-600">{label}</label>
-    <p className="text-gray-900">{value}</p>
+    <label className="text-sm font-medium text-gray-400">{label}</label>
+    <p className="text-white">{value}</p>
   </div>
 );
 
@@ -892,17 +881,17 @@ const DocumentCard: React.FC<{
   hasDocument: boolean; 
   onPreview: () => void;
 }> = ({ title, hasDocument, onPreview }) => (
-  <Card className={hasDocument ? "border-green-200" : "border-gray-200"}>
+  <Card className={`${hasDocument ? "border-green-400" : "border-purple-500/20"} bg-gray-700`}>
     <CardContent className="p-4 text-center">
-      <FileText className={`w-8 h-8 mx-auto mb-2 ${hasDocument ? 'text-green-600' : 'text-gray-400'}`} />
-      <p className="font-medium text-sm mb-2">{title}</p>
+      <FileText className={`w-8 h-8 mx-auto mb-2 ${hasDocument ? 'text-green-400' : 'text-purple-400'}`} />
+      <p className="font-medium text-sm mb-2 text-white">{title}</p>
       {hasDocument ? (
-        <Button onClick={onPreview} variant="outline" size="sm" className="w-full">
+        <Button onClick={onPreview} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
           <Eye className="w-4 h-4 mr-2" />
           Voir le document
         </Button>
       ) : (
-        <Badge variant="outline" className="text-gray-500">
+        <Badge className="bg-purple-500/20 text-purple-400 border-purple-400">
           Non soumis
         </Badge>
       )}
@@ -912,15 +901,15 @@ const DocumentCard: React.FC<{
 
 const VerificationStep: React.FC<{ step: number; title: string; completed: boolean }> = 
   ({ step, title, completed }) => (
-  <div className="flex items-center gap-3 p-3 border rounded-lg">
+  <div className="flex items-center gap-3 p-3 border border-purple-500/20 rounded-lg bg-gray-700">
     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-      completed ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'
+      completed ? 'bg-green-500/20 text-green-400 border border-green-400' : 'bg-purple-500/20 text-purple-400 border border-purple-400'
     }`}>
       {completed ? <CheckCircle className="w-5 h-5" /> : step}
     </div>
     <div>
-      <p className="font-medium text-sm">{title}</p>
-      <p className="text-xs text-gray-500">{completed ? 'Complétée' : 'En attente'}</p>
+      <p className="font-medium text-sm text-white">{title}</p>
+      <p className="text-xs text-gray-400">{completed ? 'Complétée' : 'En attente'}</p>
     </div>
   </div>
 );
@@ -934,12 +923,12 @@ const ImagePreviewModal: React.FC<{
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-4xl max-h-full overflow-auto">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold">{imageData.type}</h3>
-          <Button onClick={onClose} variant="ghost" size="sm">
-            <XCircle className="w-5 h-5" />
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-lg max-w-4xl max-h-full overflow-auto border border-purple-500/20">
+        <div className="flex items-center justify-between p-4 border-b border-purple-500/20">
+          <h3 className="text-lg font-semibold text-white">{imageData.type}</h3>
+          <Button onClick={onClose} variant="ghost" size="sm" className="hover:bg-purple-500/10 text-white">
+            <XCircle className="w-5 h-5 text-purple-400" />
           </Button>
         </div>
         <div className="p-4">
@@ -955,30 +944,30 @@ const ImagePreviewModal: React.FC<{
 };
 
 const UsersLoadingSkeleton: React.FC = () => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+  <div className="min-h-screen bg-gray-900 p-6">
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <Skeleton className="h-12 w-1/3" />
-        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-12 w-1/3 bg-gray-800 rounded-2xl" />
+        <Skeleton className="h-10 w-24 bg-gray-800 rounded-xl" />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-lg" />
+          <Skeleton key={i} className="h-32 rounded-xl bg-gray-800" />
         ))}
       </div>
       
-      <Skeleton className="h-96 rounded-lg" />
+      <Skeleton className="h-96 rounded-xl bg-gray-800" />
     </div>
   </div>
 );
 
 const ErrorAlert: React.FC<{ error: string; onRetry: () => void }> = ({ error, onRetry }) => (
-  <div className="flex flex-col items-center justify-center min-h-96 space-y-4">
-    <AlertCircle className="w-16 h-16 text-red-500" />
-    <h2 className="text-xl font-semibold text-gray-900">Erreur de chargement</h2>
-    <p className="text-gray-600 text-center max-w-md">{error}</p>
-    <Button onClick={onRetry} className="flex items-center gap-2">
+  <div className="flex flex-col items-center justify-center min-h-96 space-y-4 bg-gray-800 rounded-2xl border border-purple-500/20 p-8">
+    <AlertCircle className="w-16 h-16 text-purple-400" />
+    <h2 className="text-xl font-semibold text-white">Erreur de chargement</h2>
+    <p className="text-gray-400 text-center max-w-md">{error}</p>
+    <Button onClick={onRetry} className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white">
       <RefreshCw className="w-4 h-4" />
       Réessayer
     </Button>

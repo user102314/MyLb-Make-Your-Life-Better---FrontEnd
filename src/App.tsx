@@ -47,6 +47,8 @@ import Markett from "./pages/admin/Market";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AllCompaniesPage from "./pages/admin/AllCompaniesPage";
 import AllUsersPage from "./pages/admin/AllUsersPage";
+import AdminEmailSender from "./pages/admin/AdminEmailSender";
+import SystemSettingsPage from "./pages/SystemSettingsPage";
 
 
 
@@ -55,7 +57,6 @@ const AdminOverview = () => <div className="p-6 text-xl">Bienvenue sur le Tablea
 const AdminUserManagement = () => <div className="p-6 text-xl">Gestion des Utilisateurs (A faire)</div>;
 const AdminCompanyValidation = () => <div className="p-6 text-xl">Validation des Sociétés (A faire)</div>;
 const AdminFinanceReports = () => <div className="p-6 text-xl">Rapports Financiers (A faire)</div>;
-const AdminSettings = () => <div className="p-6 text-xl">Paramètres Système (A faire)</div>;
 // -------------------------------------------------------------------------------------------------
 
 const queryClient = new QueryClient();
@@ -112,10 +113,12 @@ const App = () => (
              <Route index element={<AdminDashboard />} /> {/* /admin/ */}
              <Route path="Market" element={<Markett />} />
              <Route path="AdminVerifyUser" element={<AdminVerifyUser />} />
+             <Route path="AdminCompony" element={<CompanyApplication />} />
              <Route path="company-application" element={<AllCompaniesPage />} />
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="AllUsersPage" element={<AllUsersPage />} />
-             <Route path="settings" element={<AdminSettings />} />
+             <Route path="settings" element={<SystemSettingsPage />} />
+             <Route path="AdminEmailSender" element={<AdminEmailSender />} />
           </Route>
 
           {/* ------------------------------------------------------------- */}

@@ -62,7 +62,7 @@ const adminNavItems = [
         links: [
             { name: "Vue Générale", path: "dashboard", icon: Zap },
             { name: "Tout les utilisatuers", path: "AllUsersPage", icon: Users },
-            { name: "Toutes les Sociétés", path: "company-application", icon: Building },
+            { name: "Toutes les Sociétés", path: "AdminCompony", icon: Building },
             { name: "Toutes les Actions", path: "market", icon: TrendingUp },
         ]
     },
@@ -79,6 +79,14 @@ const adminNavItems = [
         icon: Settings, 
         links: [
             { name: "Paramètres Système", path: "settings", icon: Settings },
+            { name: "Support Technique", path: "admin-support", icon: MessageSquare },
+        ]
+    },
+    { 
+        title: "Messaging & Report", 
+        icon: Settings, 
+        links: [
+            { name: "Send Email ", path: "AdminEmailSender", icon: MessageSquare },
             { name: "Support Technique", path: "admin-support", icon: MessageSquare },
         ]
     }

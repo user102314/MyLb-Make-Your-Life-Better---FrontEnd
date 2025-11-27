@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Building, 
@@ -153,20 +153,20 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen admin-gradient p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-900/20 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
-          <div className="glass-card p-6 rounded-2xl backdrop-blur-xl border border-white/20 shadow-primary/20">
+          <div className="bg-gray-800/90 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-xl bg-purple-500/20 backdrop-blur-sm">
-                <BarChart3 className="w-8 h-8 text-purple-600" />
+              <div className="p-2 rounded-xl bg-purple-500/20 backdrop-blur-sm border border-purple-500/30">
+                <BarChart3 className="w-8 h-8 text-purple-400" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-white">
                   Tableau de Bord Admin
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-purple-300">
                   Statistiques et gestion des utilisateurs et entreprises
                 </p>
               </div>
@@ -175,22 +175,22 @@ const AdminDashboard: React.FC = () => {
           
           <div className="flex gap-3">
             <Select value={timeRange} onValueChange={(value: 'today' | 'week' | 'month' | 'all') => setTimeRange(value)}>
-              <SelectTrigger className="glass-input border-white/30 w-[140px]">
+              <SelectTrigger className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30 w-[140px] text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="glass-card border-white/20 backdrop-blur-xl">
-                <SelectItem value="today">Aujourd'hui</SelectItem>
-                <SelectItem value="week">Cette semaine</SelectItem>
-                <SelectItem value="month">Ce mois</SelectItem>
-                <SelectItem value="all">Tout le temps</SelectItem>
+              <SelectContent className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
+                <SelectItem value="today" className="text-white hover:bg-purple-500/20">Aujourd'hui</SelectItem>
+                <SelectItem value="week" className="text-white hover:bg-purple-500/20">Cette semaine</SelectItem>
+                <SelectItem value="month" className="text-white hover:bg-purple-500/20">Ce mois</SelectItem>
+                <SelectItem value="all" className="text-white hover:bg-purple-500/20">Tout le temps</SelectItem>
               </SelectContent>
             </Select>
             
             <Button
               onClick={handleRefresh}
               disabled={refreshing}
-              variant="glass"
-              className="flex items-center gap-2 neumorph-outset hover:shadow-lg transition-all duration-200"
+              variant="outline"
+              className="flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400 text-white transition-all duration-200"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               Actualiser
@@ -199,9 +199,9 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {error && (
-          <Alert variant="destructive" className="glass-card border-red-200/50 backdrop-blur-sm mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+          <Alert variant="destructive" className="bg-red-900/50 backdrop-blur-sm border-red-700/50 mb-6">
+            <AlertCircle className="h-4 w-4 text-red-400" />
+            <AlertDescription className="text-red-300">{error}</AlertDescription>
           </Alert>
         )}
 
@@ -213,7 +213,7 @@ const AdminDashboard: React.FC = () => {
               value={stats.totalUsers.toString()}
               change={stats.userGrowth}
               icon={<Users className="w-6 h-6" />}
-              color="blue"
+              color="purple"
             />
             <StatCard
               title="Entreprises"
@@ -234,22 +234,31 @@ const AdminDashboard: React.FC = () => {
               value={stats.pendingVerification.toString()}
               change={0}
               icon={<FileText className="w-6 h-6" />}
-              color="yellow"
+              color="purple"
             />
           </div>
         )}
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="glass-card backdrop-blur-sm border border-white/20 p-1">
-            <TabsTrigger value="overview" className="data-[state=active]:glass-card data-[state=active]:border-white/30">
+          <TabsList className="bg-gray-800/80 backdrop-blur-sm border border-purple-500/30 p-1">
+            <TabsTrigger 
+              value="overview" 
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:border-purple-500 data-[state=active]:text-purple-400 text-white"
+            >
               <BarChart3 className="w-4 h-4 mr-2" />
               Vue d'ensemble
             </TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:glass-card data-[state=active]:border-white/30">
+            <TabsTrigger 
+              value="users" 
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:border-purple-500 data-[state=active]:text-purple-400 text-white"
+            >
               <Users className="w-4 h-4 mr-2" />
               Utilisateurs ({userStats.length})
             </TabsTrigger>
-            <TabsTrigger value="companies" className="data-[state=active]:glass-card data-[state=active]:border-white/30">
+            <TabsTrigger 
+              value="companies" 
+              className="data-[state=active]:bg-purple-500/20 data-[state=active]:border-purple-500 data-[state=active]:text-purple-400 text-white"
+            >
               <Building className="w-4 h-4 mr-2" />
               Entreprises ({companyStats.length})
             </TabsTrigger>
@@ -259,10 +268,10 @@ const AdminDashboard: React.FC = () => {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Statistiques de Vérification */}
-              <Card className="glass-card border-white/20 backdrop-blur-xl">
-                <CardHeader className="glass-header border-b border-white/20">
-                  <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="w-5 h-5 text-blue-600" />
+              <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
+                <CardHeader className="border-b border-purple-500/30">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <UserCheck className="w-5 h-5 text-purple-400" />
                     Progression de Vérification
                   </CardTitle>
                 </CardHeader>
@@ -273,7 +282,7 @@ const AdminDashboard: React.FC = () => {
                         title="Email Vérifié"
                         completed={stats.verificationStats.emailVerified}
                         total={stats.totalUsers}
-                        color="blue"
+                        color="purple"
                       />
                       <VerificationProgress
                         title="KYC Soumis"
@@ -291,7 +300,7 @@ const AdminDashboard: React.FC = () => {
                         title="Reconnaissance Faciale"
                         completed={stats.verificationStats.faceRecognition}
                         total={stats.totalUsers}
-                        color="orange"
+                        color="purple"
                       />
                     </div>
                   )}
@@ -299,10 +308,10 @@ const AdminDashboard: React.FC = () => {
               </Card>
 
               {/* Dernières Activités */}
-              <Card className="glass-card border-white/20 backdrop-blur-xl">
-                <CardHeader className="glass-header border-b border-white/20">
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
+              <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
+                <CardHeader className="border-b border-purple-500/30">
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <TrendingUp className="w-5 h-5 text-purple-400" />
                     Activité Récente
                   </CardTitle>
                 </CardHeader>
@@ -356,22 +365,22 @@ const AdminDashboard: React.FC = () => {
 
           {/* Vue Utilisateurs */}
           <TabsContent value="users">
-            <Card className="glass-card border-white/20 backdrop-blur-xl">
-              <CardHeader className="glass-header border-b border-white/20">
+            <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
+              <CardHeader className="border-b border-purple-500/30">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Users className="w-5 h-5 text-purple-400" />
                       Gestion des Utilisateurs ({userStats.length})
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-purple-300">
                       Liste complète des utilisateurs et leur statut de vérification
                     </CardDescription>
                   </div>
                   <Button
                     onClick={() => exportData('users')}
-                    variant="glass"
-                    className="flex items-center gap-2 neumorph-outset hover:shadow-lg"
+                    variant="outline"
+                    className="flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400 text-white"
                   >
                     <Download className="w-4 h-4" />
                     Exporter
@@ -385,8 +394,8 @@ const AdminDashboard: React.FC = () => {
                   ))}
                   
                   {userStats.length === 0 && (
-                    <div className="text-center py-12 text-gray-500 glass-card rounded-2xl backdrop-blur-sm">
-                      <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <div className="text-center py-12 text-purple-300 bg-gray-800/50 backdrop-blur-sm rounded-2xl">
+                      <Users className="w-16 h-16 mx-auto mb-4 text-purple-400" />
                       <p className="text-lg">Aucun utilisateur trouvé</p>
                     </div>
                   )}
@@ -397,22 +406,22 @@ const AdminDashboard: React.FC = () => {
 
           {/* Vue Entreprises */}
           <TabsContent value="companies">
-            <Card className="glass-card border-white/20 backdrop-blur-xl">
-              <CardHeader className="glass-header border-b border-white/20">
+            <Card className="bg-gray-800/90 backdrop-blur-xl border-purple-500/30">
+              <CardHeader className="border-b border-purple-500/30">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building className="w-5 h-5 text-purple-600" />
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Building className="w-5 h-5 text-purple-400" />
                       Gestion des Entreprises ({companyStats.length})
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-purple-300">
                       Liste des entreprises créées par les utilisateurs
                     </CardDescription>
                   </div>
                   <Button
                     onClick={() => exportData('companies')}
-                    variant="glass"
-                    className="flex items-center gap-2 neumorph-outset hover:shadow-lg"
+                    variant="outline"
+                    className="flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400 text-white"
                   >
                     <Download className="w-4 h-4" />
                     Exporter
@@ -426,8 +435,8 @@ const AdminDashboard: React.FC = () => {
                   ))}
                   
                   {companyStats.length === 0 && (
-                    <div className="text-center py-12 text-gray-500 glass-card rounded-2xl backdrop-blur-sm">
-                      <Building className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <div className="text-center py-12 text-purple-300 bg-gray-800/50 backdrop-blur-sm rounded-2xl">
+                      <Building className="w-16 h-16 mx-auto mb-4 text-purple-400" />
                       <p className="text-lg">Aucune entreprise trouvée</p>
                     </div>
                   )}
@@ -441,8 +450,6 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-// Composants supplémentaires...
-
 const StatCard: React.FC<{ 
   title: string; 
   value: string; 
@@ -451,23 +458,20 @@ const StatCard: React.FC<{
   color: string;
 }> = ({ title, value, change, icon, color }) => {
   const colorClasses = {
-    blue: 'bg-blue-500/20 text-blue-600 border-blue-200/50',
-    purple: 'bg-purple-500/20 text-purple-600 border-purple-200/50',
-    green: 'bg-green-500/20 text-green-600 border-green-200/50',
-    yellow: 'bg-yellow-500/20 text-yellow-600 border-yellow-200/50',
-    orange: 'bg-orange-500/20 text-orange-600 border-orange-200/50'
+    purple: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    green: 'bg-green-500/20 text-green-400 border-green-500/30',
   };
 
   return (
-    <Card className={`glass-card backdrop-blur-xl border ${colorClasses[color]} hover:scale-105 transition-all duration-200`}>
+    <Card className={`bg-gray-800/90 backdrop-blur-xl border ${colorClasses[color]} hover:scale-105 transition-all duration-200 shadow-lg`}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+            <p className="text-sm font-medium text-purple-300">{title}</p>
+            <p className="text-2xl font-bold text-white mt-1">{value}</p>
             {change !== 0 && (
               <div className={`flex items-center gap-1 mt-1 text-sm ${
-                change > 0 ? 'text-green-600' : 'text-red-600'
+                change > 0 ? 'text-green-400' : 'text-red-400'
               }`}>
                 <TrendingUp className={`w-3 h-3 ${change < 0 ? 'rotate-180' : ''}`} />
                 <span>{Math.abs(change)}%</span>
@@ -491,25 +495,23 @@ const VerificationProgress: React.FC<{
 }> = ({ title, completed, total, color }) => {
   const percentage = total > 0 ? (completed / total) * 100 : 0;
   const colorClasses = {
-    blue: 'bg-blue-500',
     purple: 'bg-purple-500',
     green: 'bg-green-500',
-    orange: 'bg-orange-500'
   };
 
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-gray-700">{title}</span>
-        <span className="text-sm text-gray-500">{completed}/{total}</span>
+        <span className="text-sm font-medium text-white">{title}</span>
+        <span className="text-sm text-purple-300">{completed}/{total}</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-gray-700 rounded-full h-2">
         <div 
           className={`h-2 rounded-full ${colorClasses[color]} transition-all duration-300`}
           style={{ width: `${percentage}%` }}
         ></div>
       </div>
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between text-xs text-purple-300">
         <span>Progression</span>
         <span>{Math.round(percentage)}%</span>
       </div>
@@ -524,21 +526,21 @@ const ActivityItem: React.FC<{
   time: string;
 }> = ({ type, action, name, time }) => {
   const icons = {
-    user: <Users className="w-4 h-4 text-blue-500" />,
-    company: <Building className="w-4 h-4 text-purple-500" />,
-    verification: <CheckCircle className="w-4 h-4 text-green-500" />
+    user: <Users className="w-4 h-4 text-purple-400" />,
+    company: <Building className="w-4 h-4 text-purple-400" />,
+    verification: <CheckCircle className="w-4 h-4 text-green-400" />
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/50 backdrop-blur-sm border border-white/30">
-      <div className="p-2 rounded-lg bg-gray-100">
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-700/50 backdrop-blur-sm border border-purple-500/20">
+      <div className="p-2 rounded-lg bg-purple-500/10">
         {icons[type]}
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-gray-900">{action}</p>
-        <p className="text-sm text-gray-500">{name}</p>
+        <p className="text-sm font-medium text-white">{action}</p>
+        <p className="text-sm text-purple-300">{name}</p>
       </div>
-      <span className="text-xs text-gray-400">{time}</span>
+      <span className="text-xs text-purple-400">{time}</span>
     </div>
   );
 };
@@ -550,20 +552,20 @@ const QuickStat: React.FC<{
   trend: 'up' | 'down' | 'stable';
 }> = ({ title, value, description, trend }) => {
   const trendIcons = {
-    up: <TrendingUp className="w-4 h-4 text-green-500" />,
-    down: <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />,
-    stable: <div className="w-4 h-4 bg-gray-300 rounded-full" />
+    up: <TrendingUp className="w-4 h-4 text-green-400" />,
+    down: <TrendingUp className="w-4 h-4 text-red-400 rotate-180" />,
+    stable: <div className="w-4 h-4 bg-purple-400 rounded-full" />
   };
 
   return (
-    <Card className="glass-card border-white/20 backdrop-blur-sm hover:scale-105 transition-all duration-200">
+    <Card className="bg-gray-800/90 backdrop-blur-sm border-purple-500/30 hover:scale-105 transition-all duration-200">
       <CardContent className="p-4 text-center">
         <div className="flex justify-center mb-2">
           {trendIcons[trend]}
         </div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="text-sm font-medium text-gray-700">{title}</p>
-        <p className="text-xs text-gray-500 mt-1">{description}</p>
+        <p className="text-2xl font-bold text-white">{value}</p>
+        <p className="text-sm font-medium text-white">{title}</p>
+        <p className="text-xs text-purple-300 mt-1">{description}</p>
       </CardContent>
     </Card>
   );
@@ -573,41 +575,40 @@ const UserStatsCard: React.FC<{ user: UserStats }> = ({ user }) => {
   const completedSteps = Object.values(user.verificationStatus).filter(Boolean).length;
   
   return (
-    <Card className="glass-card border-white/20 backdrop-blur-sm hover:shadow-lg transition-all duration-200">
+    <Card className="bg-gray-800/90 backdrop-blur-sm border-purple-500/30 hover:shadow-lg transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 {user.firstName} {user.lastName}
               </h3>
               {user.isFullyVerified ? (
-                <Badge className="glass-card bg-green-500/20 text-green-700 border-green-200/50">
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   Vérifié
                 </Badge>
               ) : (
-                <Badge variant="outline" className="neumorph-inset text-yellow-600">
+                <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30">
                   En Attente
                 </Badge>
               )}
-              <Badge variant={user.isVerified ? "glass" : "outline"} 
-                     className={user.isVerified ? "bg-blue-500/20 text-blue-700 border-blue-200/50" : "neumorph-inset"}>
+              <Badge variant="outline" className={user.isVerified ? "bg-purple-500/20 text-purple-400 border-purple-500/30" : "bg-red-500/10 text-red-400 border-red-500/30"}>
                 {user.isVerified ? "Email Vérifié" : "Email Non Vérifié"}
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-purple-300">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-500" />
+                <Mail className="w-4 h-4 text-purple-400" />
                 <span>{user.email}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Building className="w-4 h-4 text-purple-500" />
+                <Building className="w-4 h-4 text-purple-400" />
                 <span>{user.companiesCount} entreprise(s)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-green-500" />
+                <Shield className="w-4 h-4 text-purple-400" />
                 <span>Étapes: {completedSteps}/4</span>
               </div>
             </div>
@@ -615,9 +616,9 @@ const UserStatsCard: React.FC<{ user: UserStats }> = ({ user }) => {
           
           <div className="flex gap-2">
             <Button
-              variant="glass"
+              variant="outline"
               size="sm"
-              className="neumorph-outset hover:shadow-lg"
+              className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400 text-white"
             >
               <Eye className="w-4 h-4" />
               Détails
@@ -631,26 +632,26 @@ const UserStatsCard: React.FC<{ user: UserStats }> = ({ user }) => {
 
 const CompanyStatsCard: React.FC<{ company: CompanyStats }> = ({ company }) => {
   return (
-    <Card className="glass-card border-white/20 backdrop-blur-sm hover:shadow-lg transition-all duration-200">
+    <Card className="bg-gray-800/90 backdrop-blur-sm border-purple-500/30 hover:shadow-lg transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-white">
                 {company.companyName}
               </h3>
-              <Badge variant="outline" className="neumorph-inset text-blue-600">
+              <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30">
                 {company.status}
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-purple-300">
               <div className="flex items-center gap-2">
-                <UserCheck className="w-4 h-4 text-purple-500" />
+                <UserCheck className="w-4 h-4 text-purple-400" />
                 <span>Propriétaire: {company.ownerName}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gray-500" />
+                <Mail className="w-4 h-4 text-purple-400" />
                 <span>{company.ownerEmail}</span>
               </div>
             </div>
@@ -658,9 +659,9 @@ const CompanyStatsCard: React.FC<{ company: CompanyStats }> = ({ company }) => {
           
           <div className="flex gap-2">
             <Button
-              variant="glass"
+              variant="outline"
               size="sm"
-              className="neumorph-outset hover:shadow-lg"
+              className="bg-gray-800/80 backdrop-blur-sm border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-400 text-white"
             >
               <Eye className="w-4 h-4" />
               Voir
@@ -673,25 +674,25 @@ const CompanyStatsCard: React.FC<{ company: CompanyStats }> = ({ company }) => {
 };
 
 const DashboardLoadingSkeleton: React.FC = () => (
-  <div className="min-h-screen admin-gradient p-6">
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-900/20 p-6">
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
-        <Skeleton className="h-12 w-1/3 glass-card rounded-2xl" />
+        <Skeleton className="h-12 w-1/3 bg-gray-800/90 rounded-2xl" />
         <div className="flex gap-3">
-          <Skeleton className="h-10 w-32 glass-card rounded-xl" />
-          <Skeleton className="h-10 w-24 glass-card rounded-xl" />
+          <Skeleton className="h-10 w-32 bg-gray-800/90 rounded-xl" />
+          <Skeleton className="h-10 w-24 bg-gray-800/90 rounded-xl" />
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-xl glass-card" />
+          <Skeleton key={i} className="h-32 rounded-xl bg-gray-800/90" />
         ))}
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Skeleton className="h-80 rounded-2xl glass-card" />
-        <Skeleton className="h-80 rounded-2xl glass-card" />
+        <Skeleton className="h-80 rounded-2xl bg-gray-800/90" />
+        <Skeleton className="h-80 rounded-2xl bg-gray-800/90" />
       </div>
     </div>
   </div>

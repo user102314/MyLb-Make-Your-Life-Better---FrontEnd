@@ -38,7 +38,7 @@ const Button = ({ children, onClick, variant = 'default', disabled = false, clas
     
     switch (variant) {
         case 'outline':
-            baseStyle += " bg-transparent border-2 border-gray-600 text-gray-300 hover:bg-gray-700";
+            baseStyle += " bg-transparent border-2 border-purple-600 text-purple-400 hover:bg-purple-600/20";
             break;
         case 'destructive':
             baseStyle += " bg-red-600 text-white hover:bg-red-700";
@@ -47,7 +47,7 @@ const Button = ({ children, onClick, variant = 'default', disabled = false, clas
             baseStyle += " bg-green-600 text-white hover:bg-green-700";
             break;
         default:
-            baseStyle += " bg-blue-600 text-white hover:bg-blue-700";
+            baseStyle += " bg-purple-600 text-white hover:bg-purple-700";
             break;
     }
 
@@ -377,13 +377,13 @@ const App = () => {
         
         return (
             <div className="flex items-center p-3 bg-gray-700 border border-gray-600 rounded-lg">
-                <Icon className="w-5 h-5 mr-2 text-blue-400" />
+                <Icon className="w-5 h-5 mr-2 text-purple-400" />
                 <span className="text-sm flex-1 text-gray-300">{label}</span>
                 <div className="flex gap-2">
                     {fileType === 'image' && (
                         <button
                             onClick={() => handleDocument(base64Data, fileName, 'view')}
-                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            className="text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
                         >
                             Voir
                         </button>
@@ -391,7 +391,7 @@ const App = () => {
                     {fileType === 'pdf' && (
                         <button
                             onClick={() => handleDocument(base64Data, fileName, 'view')}
-                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                            className="text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
                         >
                             Ouvrir
                         </button>
@@ -411,7 +411,7 @@ const App = () => {
         if (loadingDetails) {
             return (
                 <div className="flex flex-col justify-center items-center h-40">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
                     <span className="mt-3 text-gray-300">Chargement des détails...</span>
                 </div>
             );
@@ -427,7 +427,7 @@ const App = () => {
             <div className="space-y-6">
                 {/* Informations de base */}
                 <section>
-                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-blue-400">Informations de Base</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-purple-400">Informations de Base</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-gray-700 p-4 rounded-lg">
                         <p className="text-gray-300"><strong className="text-white">ID Société:</strong> <span className="font-medium">{company.companyId}</span></p>
                         <p className="text-gray-300"><strong className="text-white">ID Propriétaire:</strong> <span className="font-medium">{company.ownerID}</span></p>
@@ -481,7 +481,7 @@ const App = () => {
 
                 {/* Validation */}
                 <section>
-                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-blue-400">Informations de Validation</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-purple-400">Informations de Validation</h3>
                     {company.nomLegalComplet || company.numeroImmatriculation ? (
                         <div className="space-y-4 bg-gray-700 p-4 rounded-lg">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -528,12 +528,12 @@ const App = () => {
 
                 {/* État Financier - Bilan */}
                 <section>
-                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-blue-400">État Financier - Bilan</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-purple-400">État Financier - Bilan</h3>
                     {company.actifTotal !== undefined || company.passifTotal !== undefined ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm bg-gray-700 p-4 rounded-lg">
                             <div className="bg-gray-800 p-3 rounded-lg border border-gray-600">
                                 <p className="text-gray-400 text-xs mb-1">Actif Total</p>
-                                <p className="font-bold text-base text-blue-400">{formatCurrency(company.actifTotal)}</p>
+                                <p className="font-bold text-base text-purple-400">{formatCurrency(company.actifTotal)}</p>
                             </div>
                             <div className="bg-gray-800 p-3 rounded-lg border border-gray-600">
                                 <p className="text-gray-400 text-xs mb-1">Actif Immobilisé</p>
@@ -566,7 +566,7 @@ const App = () => {
 
                 {/* Compte de Résultat */}
                 <section>
-                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-blue-400">Compte de Résultat</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-purple-400">Compte de Résultat</h3>
                     {company.chiffreAffaires !== undefined || company.resultatNet !== undefined ? (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-gray-700 p-4 rounded-lg">
                             <div className="bg-gray-800 p-3 rounded-lg border border-gray-600">
@@ -598,7 +598,7 @@ const App = () => {
 
                 {/* Flux de Trésorerie */}
                 <section>
-                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-blue-400">Flux de Trésorerie</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-600 pb-2 mb-3 text-purple-400">Flux de Trésorerie</h3>
                     {company.fluxOperationnels !== undefined || company.variationNetteTresorerie !== undefined ? (
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm bg-gray-700 p-4 rounded-lg">
@@ -642,8 +642,8 @@ const App = () => {
     };
 
     return (
-        <div className="p-6 md:p-10 min-h-screen bg-gray-900 text-white">
-            <h1 className="text-3xl font-extrabold mb-2 text-blue-400">Tableau de Bord Administrateur</h1>
+        <div className="p-6 md:p-10 min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white">
+            <h1 className="text-3xl font-extrabold mb-2 text-purple-400">Tableau de Bord Administrateur</h1>
             <h2 className="text-2xl font-bold mb-4">Gestion des Sociétés</h2>
             <p className="text-gray-400 mb-8">
                 Liste complète de toutes les sociétés enregistrées avec leurs informations détaillées.
@@ -672,7 +672,7 @@ const App = () => {
             ) : (
                 <div className="space-y-4">
                     {companies.map((company) => (
-                        <Card key={company.companyId} className="hover:shadow-2xl hover:border-blue-600 transition-all duration-300">
+                        <Card key={company.companyId} className="hover:shadow-2xl hover:border-purple-500 transition-all duration-300">
                             <CardHeader className="flex flex-row items-center justify-between p-4 md:p-6">
                                 <div className="flex flex-col flex-1">
                                     <CardTitle className="text-xl font-bold">{company.companyName}</CardTitle>
@@ -697,7 +697,7 @@ const App = () => {
                                         onClick={() => fetchCompanyDetails(company.companyId)}
                                         disabled={loadingDetails}
                                         variant="outline"
-                                        className="text-blue-400 border-blue-600 hover:bg-blue-900/30"
+                                        className="text-purple-400 border-purple-600 hover:bg-purple-900/30"
                                     >
                                         Voir Détails
                                     </Button>
@@ -818,9 +818,9 @@ const App = () => {
             {/* Formulaire de création de stock */}
             {confirmAction && showStockForm && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm overflow-y-auto p-4">
-                    <div className="bg-gray-800 border-2 border-blue-600 rounded-2xl p-8 max-w-2xl w-full my-8 shadow-2xl">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-900/30 border-2 border-blue-500">
-                            <FileText className="w-10 h-10 text-blue-400" />
+                    <div className="bg-gray-800 border-2 border-purple-600 rounded-2xl p-8 max-w-2xl w-full my-8 shadow-2xl">
+                        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 bg-purple-900/30 border-2 border-purple-500">
+                            <FileText className="w-10 h-10 text-purple-400" />
                         </div>
                         
                         <h3 className="text-2xl font-bold mb-2 text-center text-white">
@@ -828,7 +828,7 @@ const App = () => {
                         </h3>
                         
                         <p className="text-gray-400 mb-6 text-center">
-                            Définissez les paramètres du stock pour <span className="text-blue-400 font-semibold">{confirmAction.companyName}</span>
+                            Définissez les paramètres du stock pour <span className="text-purple-400 font-semibold">{confirmAction.companyName}</span>
                         </p>
                         
                         <form className="space-y-5">
@@ -842,7 +842,7 @@ const App = () => {
                                     value={stockFormData.nomStock}
                                     onChange={(e) => setStockFormData({...stockFormData, nomStock: e.target.value})}
                                     placeholder={`Ex: Stock ${confirmAction.companyName}`}
-                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
                                     Suggestion: Stock {confirmAction.companyName}
@@ -894,7 +894,7 @@ const App = () => {
                                         }}
                                         placeholder="Ex: 1000"
                                         min="0"
-                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                     />
                                 </div>
 
@@ -909,7 +909,7 @@ const App = () => {
                                         onChange={(e) => setStockFormData({...stockFormData, stockReste: e.target.value})}
                                         placeholder="Auto-rempli"
                                         min="0"
-                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                     />
                                     <p className="text-xs text-gray-500 mt-1">
                                         Par défaut = Stock disponible
@@ -929,7 +929,7 @@ const App = () => {
                                     onChange={(e) => setStockFormData({...stockFormData, prixStock: e.target.value})}
                                     placeholder="Ex: 25.50"
                                     min="0"
-                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                 />
                             </div>
 
@@ -941,7 +941,7 @@ const App = () => {
                                 <select
                                     value={stockFormData.etat}
                                     onChange={(e) => setStockFormData({...stockFormData, etat: e.target.value})}
-                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
                                 >
                                     <option value="DISPONIBLE">Disponible</option>
                                     <option value="RUPTURE">Rupture de stock</option>
@@ -950,8 +950,8 @@ const App = () => {
                             </div>
 
                             {/* Résumé */}
-                            <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
-                                <h4 className="text-sm font-bold text-blue-300 mb-2">📊 Résumé</h4>
+                            <div className="bg-purple-900/20 border border-purple-700 rounded-lg p-4">
+                                <h4 className="text-sm font-bold text-purple-300 mb-2">📊 Résumé</h4>
                                 <div className="space-y-1 text-sm text-gray-300">
                                     <p>• <strong>Stock:</strong> {stockFormData.nomStock || 'Non défini'}</p>
                                     <p>• <strong>Quantité:</strong> {stockFormData.stockDisponible || '0'} unités</p>
