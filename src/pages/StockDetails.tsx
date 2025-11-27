@@ -108,32 +108,30 @@ const StockDetails: React.FC = () => {
 
     checkAuthentication();
   }, [navigate]);
-
-  // Charger les données du client
-  const fetchClientData = async (idClient: number) => {
-    try {
-      // Récupérer le solde du wallet
-      const soldeResponse = await fetch(`${WALLET_API_URL}/${idClient}/solde`, {
-        credentials: 'include'
-      });
-      if (soldeResponse.ok) {
-        const soldeData = await soldeResponse.json();
-        setClientSolde(soldeData.solde || 0);
-      }
-
-      // Récupérer les stocks du client
-      const stocksResponse = await fetch(`${STOCK_WALLET_API_URL}/client/${idClient}`, {
-        credentials: 'include'
-      });
-      if (stocksResponse.ok) {
-        const stocksData = await stocksResponse.json();
-        setClientStocks(stocksData);
-      }
-    } catch (err) {
-      console.error('Error fetching client data:', err);
+// Charger les données du client
+const fetchClientData = async () => {
+  try {
+    // Récupérer le solde du wallet (NOUVEL ENDPOINT)
+    const soldeResponse = await fetch(`${WALLET_API_URL}/solde`, {
+      credentials: 'include'
+    });
+    if (soldeResponse.ok) {
+      const soldeData = await soldeResponse.json();
+      setClientSolde(soldeData.solde || 0);
     }
-  };
 
+    // Récupérer les stocks du client (NOUVEL ENDPOINT)
+    const stocksResponse = await fetch(`${STOCK_WALLET_API_URL}`, {
+      credentials: 'include'
+    });
+    if (stocksResponse.ok) {
+      const stocksData = await stocksResponse.json();
+      setClientStocks(stocksData);
+    }
+  } catch (err) {
+    console.error('Error fetching client data:', err);
+  }
+};
   // Fonction pour récupérer l'historique depuis l'API Python
   const fetchStockHistory = async (stockId: number, limit: number = 500) => {
     try {
@@ -442,6 +440,7 @@ const StockDetails: React.FC = () => {
       <TrendingDown className="w-4 h-4" />;
   };
 
+  // Composant personnalisé pour les points du graphique
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
     
@@ -741,9 +740,140 @@ const StockDetails: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Graphique */}
+        {/* Graphique style Binance */}
         <div className="lg:col-span-2 bg-[#0B0E11] border border-[#2B3139] rounded-xl overflow-hidden shadow-2xl">
-          {/* ... (le code du graphique reste identique) ... */}
+          <div className="px-6 pt-4 pb-2">
+            <h2 className="text-lg font-semibold text-gray-200 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-emerald-500" />
+              Chart - {timeFilter} 
+              <span className="text-sm text-gray-400 ml-2">
+                (Courbe fixe + point mobile)
+              </span>
+            </h2>
+          </div>
+          
+          <div className="h-[450px] px-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart 
+                data={chartData}
+                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+              >
+                <defs>
+                  <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={priceChange >= 0 ? "#0ECB81" : "#F6465D"} stopOpacity={0.4}/>
+                    <stop offset="75%" stopColor={priceChange >= 0 ? "#0ECB81" : "#F6465D"} stopOpacity={0.05}/>
+                    <stop offset="100%" stopColor={priceChange >= 0 ? "#0ECB81" : "#F6465D"} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid 
+                  strokeDasharray="0" 
+                  stroke="#2B3139" 
+                  horizontal={true}
+                  vertical={false}
+                  strokeWidth={0.5}
+                />
+                <XAxis 
+                  dataKey="time" 
+                  stroke="#474D57"
+                  fontSize={11}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#848E9C' }}
+                  dy={10}
+                />
+                <YAxis 
+                  stroke="#474D57"
+                  fontSize={11}
+                  domain={['auto', 'auto']}
+                  axisLine={false}
+                  tickLine={false}
+                  orientation="right"
+                  tick={{ fill: '#848E9C' }}
+                  tickFormatter={(value) => `${value.toFixed(2)}`}
+                />
+                <Tooltip 
+                  cursor={{ stroke: '#474D57', strokeWidth: 1, strokeDasharray: '5 5' }}
+                  contentStyle={{ 
+                    backgroundColor: '#1E2329', 
+                    border: '1px solid #2B3139',
+                    borderRadius: '4px',
+                    padding: '8px 12px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+                  }}
+                  labelStyle={{ 
+                    color: '#848E9C',
+                    fontSize: '11px',
+                    marginBottom: '4px'
+                  }}
+                  itemStyle={{ 
+                    color: priceChange >= 0 ? '#0ECB81' : '#F6465D',
+                    fontSize: '13px',
+                    fontWeight: '600'
+                  }}
+                  formatter={(value: number) => [`${value.toFixed(2)} €`, 'Prix']}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload[0]) {
+                      const data = payload[0].payload;
+                      return `${data.date} ${label} ${data.isNew ? '🟢' : ''}`;
+                    }
+                    return label;
+                  }}
+                />
+                
+                {/* Zone remplie */}
+                <Area
+                  type="monotone"
+                  dataKey="price"
+                  stroke="none"
+                  fill="url(#colorPrice)"
+                  fillOpacity={0.3}
+                />
+                
+                {/* Ligne principale (courbe fixe) */}
+                <Line 
+                  type="monotone" 
+                  dataKey="price" 
+                  stroke={priceChange >= 0 ? '#0ECB81' : '#F6465D'}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={false}
+                  animationDuration={0}
+                />
+                
+                {/* Point du dernier prix */}
+                <Line 
+                  type="monotone" 
+                  dataKey="price" 
+                  stroke="none"
+                  dot={<CustomDot />}
+                  activeDot={false}
+                  legendType="none"
+                />
+                
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          
+          {/* Légende en bas */}
+          <div className="px-6 py-3 border-t border-[#2B3139]">
+            <div className="flex items-center justify-between text-sm text-gray-400">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-0.5 bg-green-500"></div>
+                  <span>Courbe historique</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span>Point actuel</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className={priceChange >= 0 ? 'text-green-500' : 'text-red-500'}>
+                  {priceChange >= 0 ? '↗' : '↘'} {Math.abs(priceChange).toFixed(2)}%
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Listes des variations et informations trading */}

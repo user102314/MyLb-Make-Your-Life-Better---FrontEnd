@@ -5,7 +5,8 @@ import {
   User, Settings, Lock, Shield, ListTodo, 
   Building, PlusCircle, Briefcase, TrendingUp, 
   Sliders, Zap, DollarSign, CreditCard, 
-  MessageSquare, ChevronDown, LogOut 
+  MessageSquare, ChevronDown, LogOut,
+  Bell
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -16,6 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import BellIconWithNotifications from "../pages/BellIconWithNotifications"; // Import du composant notification
+import logo from '../img/logo.png';
 
 // Structure du menu utilisateur
 const userMenuSections = [
@@ -90,7 +93,7 @@ const useAuthPlaceholder = () => {
             } catch (error) {
                 console.error("Authentication check failed:", error);
                 setUserName(null);
-                setIsAuthenticated(false);
+                    setIsAuthenticated(false);
             } finally {
                 setLoadingAuth(false);
             }
@@ -174,22 +177,36 @@ const Navbar = () => {
                         inset 0 10px 10px -10px rgba(0,0,0,0.1),
                         inset 0 -10px 10px -10px rgba(0,0,0,0.1);
                 }
+
+                /* Animation pour le badge de notification */
+                @keyframes pulse-gentle {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+                
+                .animate-pulse-gentle {
+                    animation: pulse-gentle 2s infinite;
+                }
                 `}
             </style>
 
-            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+           <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 items-center justify-between">
-                        {/* Logo */}
-                        <Link to="/" className="flex items-center space-x-3 group">
-                            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg">
-                                <span className="text-white font-bold text-lg">ML</span>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-lg font-semibold text-foreground leading-none">MyLB</span>
-                                <span className="text-xs text-muted-foreground leading-none">Capital</span>
-                            </div>
-                        </Link>
+                   <div className="flex h-16 items-center justify-between">
+                       {/* Logo */}
+                       <Link to="/" className="flex items-center space-x-3 group">
+                           <div className="flex items-center justify-center w-10 h-10 rounded-lg overflow-hidden">
+                               <img 
+                                   src={logo} 
+                                   alt="MyLB Capital Logo" 
+                                   className="w-full h-full object-cover"
+                               />
+                           </div>
+                           <div className="flex flex-col">
+                               <span className="text-lg font-semibold text-foreground leading-none">MyLB</span>
+                               <span className="text-xs text-muted-foreground leading-none">Capital</span>
+                           </div>
+                       </Link>
                         
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-8">
@@ -215,7 +232,12 @@ const Navbar = () => {
                                     <div className="hidden sm:block w-20 h-4 bg-muted rounded animate-pulse"></div>
                                 </div>
                             ) : isAuthenticated ? (
-                                <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-3">
+                                    {/* Icône de notifications */}
+                                    <div className="relative">
+                                        <BellIconWithNotifications />
+                                    </div>
+
                                     {/* Menu déroulant utilisateur */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

@@ -61,7 +61,6 @@ const ViewTransactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [clientId, setClientId] = useState<number | null>(null);
   const [stats, setStats] = useState<TransactionStats | null>(null);
   const [walletBalance, setWalletBalance] = useState<number>(0);
 
@@ -76,65 +75,63 @@ const ViewTransactions: React.FC = () => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  // Vérifier l'authentification
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const authResponse = await fetch(API_AUTH_CHECK_URL, { 
-          credentials: 'include' 
-        });
-        
-        if (authResponse.status === 401) {
-          navigate('/login', { replace: true });
-          return;
-        }
-        
-        if (authResponse.ok) {
-          const storedClientId = localStorage.getItem('clientId') || '1';
-          setClientId(parseInt(storedClientId));
-        }
-      } catch (err) {
-        console.error('Authentication error:', err);
+  // Fonction utilitaire pour les appels API
+  const apiCall = async <T,>(
+    url: string, 
+    options: RequestInit = {}
+  ): Promise<T | null> => {
+    try {
+      const defaultOptions: RequestInit = {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      };
+
+      const response = await fetch(url, { ...defaultOptions, ...options });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    checkAuthentication();
-  }, [navigate]);
+      return await response.json();
+    } catch (err) {
+      console.error(`API Error [${url}]:`, err);
+      return null;
+    }
+  };
 
-  // Charger les données
+  // Vérifier l'authentification et charger les données
   const fetchData = async () => {
-    if (!clientId) return;
-    
     setLoading(true);
     try {
-      // Charger les transactions
-      const transactionsResponse = await fetch(`${API_TRANSACTIONS_URL}/client/${clientId}`, {
-        credentials: 'include'
+      // Vérifier l'authentification
+      const authResponse = await fetch(API_AUTH_CHECK_URL, { 
+        credentials: 'include' 
       });
       
-      if (transactionsResponse.ok) {
-        const transactionsData = await transactionsResponse.json();
+      if (authResponse.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      // Charger les transactions (NOUVEL ENDPOINT)
+      const transactionsData = await apiCall<Transaction[]>(`${API_TRANSACTIONS_URL}`);
+      if (transactionsData) {
         setTransactions(transactionsData);
         setFilteredTransactions(transactionsData);
       }
 
-      // Charger les statistiques
-      const statsResponse = await fetch(`${API_TRANSACTIONS_URL}/client/${clientId}/stats`, {
-        credentials: 'include'
-      });
-      
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
+      // Charger les statistiques (NOUVEL ENDPOINT)
+      const statsData = await apiCall<TransactionStats>(`${API_TRANSACTIONS_URL}/stats`);
+      if (statsData) {
         setStats(statsData);
       }
 
-      // Charger le solde du wallet
-      const walletResponse = await fetch(`${API_WALLET_URL}/${clientId}/solde`, {
-        credentials: 'include'
-      });
-      
-      if (walletResponse.ok) {
-        const walletData = await walletResponse.json();
+      // Charger le solde du wallet (NOUVEL ENDPOINT)
+      const walletData = await apiCall<{ solde: number }>(`${API_WALLET_URL}/solde`);
+      if (walletData) {
         setWalletBalance(walletData.solde || 0);
       }
 
@@ -146,10 +143,8 @@ const ViewTransactions: React.FC = () => {
   };
 
   useEffect(() => {
-    if (clientId) {
-      fetchData();
-    }
-  }, [clientId]);
+    fetchData();
+  }, [navigate]);
 
   // Appliquer les filtres
   useEffect(() => {
@@ -221,6 +216,20 @@ const ViewTransactions: React.FC = () => {
 
     setFilteredTransactions(filtered);
   }, [transactions, searchTerm, typeFilter, statusFilter, dateFilter, sortBy]);
+
+  // Charger les transactions par type
+  const loadTransactionsByType = async (type: string) => {
+    try {
+      const transactionsData = await apiCall<Transaction[]>(`${API_TRANSACTIONS_URL}/type/${type}`);
+      if (transactionsData) {
+        setTransactions(transactionsData);
+        setFilteredTransactions(transactionsData);
+        setTypeFilter(type);
+      }
+    } catch (err) {
+      console.error('Error loading transactions by type:', err);
+    }
+  };
 
   // Formater le montant
   const formatAmount = (amount: number) => {
@@ -356,12 +365,12 @@ const ViewTransactions: React.FC = () => {
 
                 <div className="flex justify-between items-center text-sm">
                   <div>
-                    <p className="text-blue-200">Client ID</p>
-                    <p className="font-mono">{clientId}</p>
-                  </div>
-                  <div className="text-right">
                     <p className="text-blue-200">Transactions</p>
                     <p className="font-bold">{transactions.length}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-blue-200">Statut</p>
+                    <p className="font-bold">Connecté</p>
                   </div>
                 </div>
               </CardContent>
@@ -376,7 +385,7 @@ const ViewTransactions: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {stats && (
+                {stats ? (
                   <>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-300">Total Dépôts</span>
@@ -395,7 +404,48 @@ const ViewTransactions: React.FC = () => {
                       </span>
                     </div>
                   </>
+                ) : (
+                  <div className="text-center text-slate-400 py-4">
+                    <BarChart3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>Chargement des statistiques...</p>
+                  </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Filtres Rapides par Type */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Filter className="w-5 h-5" />
+                  Types Rapides
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button 
+                  variant="outline"
+                  className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
+                  onClick={() => loadTransactionsByType('DEPOSIT')}
+                >
+                  <ArrowDown className="w-4 h-4 mr-2 text-green-400" />
+                  Dépôts
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
+                  onClick={() => loadTransactionsByType('WITHDRAW')}
+                >
+                  <ArrowUp className="w-4 h-4 mr-2 text-red-400" />
+                  Retraits
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
+                  onClick={() => loadTransactionsByType('USER_TRANSFER')}
+                >
+                  <User className="w-4 h-4 mr-2 text-blue-400" />
+                  Transferts
+                </Button>
               </CardContent>
             </Card>
 
@@ -500,6 +550,7 @@ const ViewTransactions: React.FC = () => {
                       setStatusFilter('ALL');
                       setDateFilter('ALL');
                       setSortBy('DATE_DESC');
+                      fetchData(); // Recharger toutes les transactions
                     }}
                   >
                     Réinitialiser
@@ -553,7 +604,7 @@ const ViewTransactions: React.FC = () => {
                     </CardDescription>
                   </div>
                   <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
-                    {clientId ? `Client #${clientId}` : 'Chargement...'}
+                    Session Active
                   </Badge>
                 </div>
               </CardHeader>
@@ -570,7 +621,7 @@ const ViewTransactions: React.FC = () => {
                     </p>
                     {transactions.length === 0 && (
                       <Button 
-                        onClick={() => navigate('/dashboard/deposit')}
+                        onClick={() => navigate('/dashboard/wallet')}
                         className="bg-blue-600 hover:bg-blue-700"
                       >
                         Effectuer une transaction

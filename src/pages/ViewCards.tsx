@@ -42,7 +42,6 @@ const ViewCards: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
-  const [clientId, setClientId] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
 
   // États pour l'ajout de carte
@@ -63,53 +62,56 @@ const ViewCards: React.FC = () => {
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
   const [transferAmount, setTransferAmount] = useState('');
 
-  // Vérifier l'authentification
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const authResponse = await fetch(API_AUTH_CHECK_URL, { 
-          credentials: 'include' 
-        });
-        
-        if (authResponse.status === 401) {
-          navigate('/login', { replace: true });
-          return;
-        }
-        
-        if (authResponse.ok) {
-          const storedClientId = localStorage.getItem('clientId') || '1';
-          setClientId(parseInt(storedClientId));
-        }
-      } catch (err) {
-        console.error('Authentication error:', err);
-        setError('Erreur de connexion au serveur');
+  // Fonction utilitaire pour les appels API
+  const apiCall = async <T,>(
+    url: string, 
+    options: RequestInit = {}
+  ): Promise<T | null> => {
+    try {
+      const defaultOptions: RequestInit = {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      };
+
+      const response = await fetch(url, { ...defaultOptions, ...options });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    checkAuthentication();
-  }, [navigate]);
+      return await response.json();
+    } catch (err) {
+      console.error(`API Error [${url}]:`, err);
+      return null;
+    }
+  };
 
-  // Charger les cartes
-  const fetchCards = async () => {
-    if (!clientId) return;
-    
+  // Vérifier l'authentification et charger les données
+  const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_CARDS_URL}/client/${clientId}`, {
-        credentials: 'include'
+      // Vérifier l'authentification
+      const authResponse = await fetch(API_AUTH_CHECK_URL, { 
+        credentials: 'include' 
       });
       
-      if (!response.ok) {
-        if (response.status === 404) {
-          setCards([]);
-          return;
-        }
-        throw new Error(`Erreur ${response.status} lors du chargement des cartes`);
+      if (authResponse.status === 401) {
+        navigate('/login', { replace: true });
+        return;
       }
-      
-      const cardsData = await response.json();
-      setCards(cardsData);
+
+      // Charger les cartes (NOUVEL ENDPOINT)
+      const cardsData = await apiCall<CardData[]>(`${API_CARDS_URL}`);
+      if (cardsData) {
+        setCards(cardsData);
+      } else {
+        setCards([]);
+      }
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur de chargement des cartes';
       setError(errorMessage);
@@ -119,10 +121,8 @@ const ViewCards: React.FC = () => {
   };
 
   useEffect(() => {
-    if (clientId) {
-      fetchCards();
-    }
-  }, [clientId]);
+    fetchData();
+  }, [navigate]);
 
   // Validation des champs de carte
   const validateCardField = (field: string, value: string): string => {
@@ -202,11 +202,6 @@ const ViewCards: React.FC = () => {
 
   // Ajouter une nouvelle carte
   const handleAddCard = async () => {
-    if (!clientId) {
-      setError('Client non identifié');
-      return;
-    }
-
     // Validation finale avant envoi
     const errors: ValidationErrors = {};
     errors.cardNumber = validateCardField('cardNumber', newCard.cardNumber);
@@ -230,47 +225,32 @@ const ViewCards: React.FC = () => {
         cardHolderName: newCard.cardHolderName.toUpperCase().trim(),
         expiryDate: newCard.expiryDate,
         cvv: newCard.cvv,
-        idClient: clientId,
         cardType: newCard.cardType
+        // idClient est maintenant géré par la session dans le backend
       };
 
-      const response = await fetch(API_CARDS_URL, {
+      const response = await apiCall<CardData>(API_CARDS_URL, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify(cardData)
       });
 
-      const responseText = await response.text();
-      
-      if (!response.ok) {
-        let errorMessage = `Erreur ${response.status}`;
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
+      if (response) {
+        setSuccessMessage('✅ Carte ajoutée avec succès');
+        setShowAddCard(false);
+        setNewCard({
+          cardNumber: '',
+          cardHolderName: '',
+          expiryDate: '',
+          cvv: '',
+          cardType: 'VISA'
+        });
+        setValidationErrors({});
+        
+        // Recharger la liste des cartes
+        await fetchData();
+      } else {
+        throw new Error('Erreur lors de l\'ajout de la carte');
       }
-
-      setSuccessMessage('✅ Carte ajoutée avec succès');
-      setShowAddCard(false);
-      setNewCard({
-        cardNumber: '',
-        cardHolderName: '',
-        expiryDate: '',
-        cvv: '',
-        cardType: 'VISA'
-      });
-      setValidationErrors({});
-      
-      // Recharger la liste des cartes
-      setTimeout(() => {
-        fetchCards();
-      }, 500);
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'ajout de la carte';
@@ -280,7 +260,7 @@ const ViewCards: React.FC = () => {
     }
   };
 
-  // Transférer du solde vers le wallet
+  // Transférer du solde vers le wallet (NOUVEL ENDPOINT)
   const handleTransferToWallet = async () => {
     const transferError = validateTransfer();
     if (transferError) {
@@ -288,50 +268,30 @@ const ViewCards: React.FC = () => {
       return;
     }
 
-    if (!clientId || !selectedCardId) return;
+    if (!selectedCardId) return;
 
     const amount = parseFloat(transferAmount);
     setProcessing(true);
     setError(null);
     
     try {
-      // 1. Retirer de la carte
-      const cardResponse = await fetch(`${API_CARDS_URL}/${selectedCardId}/retirer-solde`, {
+      // Utiliser le nouvel endpoint de transfert
+      const response = await apiCall<CardData>(`${API_CARDS_URL}/${selectedCardId}/transfer-to-wallet`, {
         method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify({ montant: amount })
       });
 
-      if (!cardResponse.ok) {
-        const errorText = await cardResponse.text();
-        throw new Error(`Erreur lors du retrait de la carte: ${errorText}`);
+      if (response) {
+        setSuccessMessage(`✅ Transfert de ${amount.toFixed(3)} DT effectué avec succès`);
+        setShowAddToWallet(false);
+        setTransferAmount('');
+        setSelectedCardId(null);
+        
+        // Recharger les données
+        await fetchData();
+      } else {
+        throw new Error('Erreur lors du transfert');
       }
-
-      // 2. Ajouter au wallet
-      const walletResponse = await fetch(`${API_WALLET_URL}/${clientId}/recharger`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ montant: amount })
-      });
-
-      if (!walletResponse.ok) {
-        const errorText = await walletResponse.text();
-        throw new Error(`Erreur lors de l'ajout au wallet: ${errorText}`);
-      }
-
-      setSuccessMessage(`✅ Transfert de ${amount.toFixed(3)} DT effectué avec succès`);
-      setShowAddToWallet(false);
-      setTransferAmount('');
-      setSelectedCardId(null);
-      
-      // Recharger les données
-      fetchCards();
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du transfert';
@@ -351,21 +311,16 @@ const ViewCards: React.FC = () => {
     setError(null);
     
     try {
-      const response = await fetch(`${API_CARDS_URL}/${cardId}/desactiver`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
+      const response = await apiCall<CardData>(`${API_CARDS_URL}/${cardId}/desactiver`, {
+        method: 'PUT'
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur: ${errorText}`);
+      if (response) {
+        setSuccessMessage('✅ Carte désactivée avec succès');
+        await fetchData();
+      } else {
+        throw new Error('Erreur lors de la désactivation');
       }
-
-      setSuccessMessage('✅ Carte désactivée avec succès');
-      fetchCards();
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la désactivation';
@@ -793,7 +748,7 @@ const ViewCards: React.FC = () => {
                 <Button 
                   variant="outline" 
                   className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-                  onClick={fetchCards}
+                  onClick={fetchData}
                   disabled={processing}
                 >
                   Actualiser la liste

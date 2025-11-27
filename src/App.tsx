@@ -38,6 +38,17 @@ import StatisticsPage from "./pages/StatisticsPage";
 import StockListMarket from "./pages/Market";
 import StockWallet from "./pages/StockWallet";
 import ChatSupport from "./pages/ChatSupport";
+import BestSales from "./pages/BestSales";
+import Notifications from "./pages/Notification";
+import AnalysisPage from "./pages/Analysis";
+import CheckTechniqueByAIPage from "./pages/CheckTechniqueByAIPage";
+import AdminVerifyUser from "./pages/admin/AdminVerifyUser";
+import Markett from "./pages/admin/Market";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AllCompaniesPage from "./pages/admin/AllCompaniesPage";
+import AllUsersPage from "./pages/admin/AllUsersPage";
+
+
 
 // 🚨 PLACEHOLDERS TEMPORAIRES (à remplacer lorsque vous créez les pages ci-dessus)
 const AdminOverview = () => <div className="p-6 text-xl">Bienvenue sur le Tableau de Bord Admin (A faire)</div>;
@@ -87,17 +98,23 @@ const App = () => (
              <Route path="market" element={<StockListMarket />} />
              <Route path="wallet" element={<ViewWallet />} />
              <Route path="cards" element={<ViewCards />} />
+             <Route path="BestSales" element={<BestSales />} />
+             <Route path="notification" element={<Notifications />} />
+             <Route path="AnalysisPage" element={<AnalysisPage />} />
+             <Route path="CheckTechniqueByAIPage" element={<CheckTechniqueByAIPage />} />
+
           </Route>
           
           {/* ------------------------------------------------------------- */}
           {/* 👑 ROUTES ADMINISTRATEUR (AdminDashboardLayout)                 */}
           {/* ------------------------------------------------------------- */}
           <Route path="/admin" element={<AdminDashboardLayout />}>
-             <Route index element={<AdminOverview />} /> {/* /admin/ */}
-             <Route path="dashboard" element={<AdminOverview />} />
-             <Route path="users" element={<AdminUserManagement />} />
-             <Route path="company-application" element={<CompanyApplication />} />
-             <Route path="finance" element={<AdminFinanceReports />} />
+             <Route index element={<AdminDashboard />} /> {/* /admin/ */}
+             <Route path="Market" element={<Markett />} />
+             <Route path="AdminVerifyUser" element={<AdminVerifyUser />} />
+             <Route path="company-application" element={<AllCompaniesPage />} />
+             <Route path="dashboard" element={<AdminDashboard />} />
+             <Route path="AllUsersPage" element={<AllUsersPage />} />
              <Route path="settings" element={<AdminSettings />} />
           </Route>
 

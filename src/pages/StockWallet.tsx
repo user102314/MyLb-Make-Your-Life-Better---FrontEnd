@@ -28,7 +28,6 @@ import { Label } from '@/components/ui/label';
 const STOCK_WALLET_API_URL = "http://localhost:9090/api/stock-wallet";
 const STOCK_TRADE_API_URL = "http://localhost:9090/api/stock-trade";
 const WALLET_API_URL = "http://localhost:9090/api/wallets";
-const PYTHON_API_BASE_URL = "http://localhost:8000";
 const API_AUTH_CHECK_URL = "http://localhost:9090/api/client/name";
 
 interface StockWalletItem {
@@ -61,73 +60,70 @@ const StockWallet: React.FC = () => {
   const [currentPrices, setCurrentPrices] = useState<{ [key: number]: number }>({});
   const [walletStats, setWalletStats] = useState<StockWalletStats | null>(null);
   const [clientSolde, setClientSolde] = useState<number>(0);
-  const [clientId, setClientId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [tradingLoading, setTradingLoading] = useState<number | null>(null);
   const [tradeMessage, setTradeMessage] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [sellQuantities, setSellQuantities] = useState<{ [key: number]: number }>({});
 
-  // Vérification de l'authentification
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      try {
-        const authResponse = await fetch(API_AUTH_CHECK_URL, { 
-          credentials: 'include' 
-        });
-        
-        if (authResponse.status === 401) {
-          navigate('/login', { replace: true });
-          return;
-        }
-        
-        if (authResponse.ok) {
-          const storedClientId = localStorage.getItem('clientId') || '1';
-          setClientId(parseInt(storedClientId));
-        }
-      } catch (err) {
-        console.error('Authentication error:', err);
+  // Fonction utilitaire pour les appels API
+  const apiCall = async <T,>(
+    url: string, 
+    options: RequestInit = {}
+  ): Promise<T | null> => {
+    try {
+      const defaultOptions: RequestInit = {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      };
+
+      const response = await fetch(url, { ...defaultOptions, ...options });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    checkAuthentication();
-  }, [navigate]);
+      return await response.json();
+    } catch (err) {
+      console.error(`API Error [${url}]:`, err);
+      return null;
+    }
+  };
 
-  // Charger les données
+  // Vérification de l'authentification et chargement des données
   const fetchData = async () => {
-    if (!clientId) return;
-    
     setLoading(true);
     try {
-      // Récupérer le stock wallet
-      const walletResponse = await fetch(`${STOCK_WALLET_API_URL}/client/${clientId}`, {
-        credentials: 'include'
+      // Vérifier l'authentification
+      const authResponse = await fetch(API_AUTH_CHECK_URL, { 
+        credentials: 'include' 
       });
       
-      if (walletResponse.ok) {
-        const walletData = await walletResponse.json();
+      if (authResponse.status === 401) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      // Récupérer le stock wallet (NOUVEL ENDPOINT)
+      const walletData = await apiCall<StockWalletItem[]>(`${STOCK_WALLET_API_URL}`);
+      if (walletData) {
         setStockWallet(walletData);
         
         // Récupérer les prix actuels pour chaque stock
         await fetchCurrentPrices(walletData);
       }
 
-      // Récupérer les statistiques du wallet
-      const statsResponse = await fetch(`${STOCK_WALLET_API_URL}/client/${clientId}/stats`, {
-        credentials: 'include'
-      });
-      
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
+      // Récupérer les statistiques du wallet (NOUVEL ENDPOINT)
+      const statsData = await apiCall<StockWalletStats>(`${STOCK_WALLET_API_URL}/stats`);
+      if (statsData) {
         setWalletStats(statsData);
       }
 
-      // Récupérer le solde du wallet
-      const soldeResponse = await fetch(`${WALLET_API_URL}/${clientId}/solde`, {
-        credentials: 'include'
-      });
-      
-      if (soldeResponse.ok) {
-        const soldeData = await soldeResponse.json();
+      // Récupérer le solde du wallet (NOUVEL ENDPOINT)
+      const soldeData = await apiCall<{ solde: number }>(`${WALLET_API_URL}/solde`);
+      if (soldeData) {
         setClientSolde(soldeData.solde || 0);
       }
 
@@ -162,15 +158,11 @@ const StockWallet: React.FC = () => {
   };
 
   useEffect(() => {
-    if (clientId) {
-      fetchData();
-    }
-  }, [clientId]);
+    fetchData();
+  }, [navigate]);
 
   // Vendre des stocks
   const handleSellStock = async (stockWalletId: number, stockId: number, maxQuantity: number) => {
-    if (!clientId) return;
-
     const quantity = sellQuantities[stockWalletId] || 1;
     if (quantity <= 0 || quantity > maxQuantity) {
       setTradeMessage({ type: 'error', message: 'Quantité invalide' });
@@ -182,7 +174,6 @@ const StockWallet: React.FC = () => {
 
     try {
       const sellRequest = {
-        idClient: clientId,
         idStockWallet: stockWalletId,
         quantite: quantity
       };
@@ -219,6 +210,26 @@ const StockWallet: React.FC = () => {
   const handleSellAll = async (stockWalletId: number, stockId: number, quantity: number) => {
     setSellQuantities(prev => ({ ...prev, [stockWalletId]: quantity }));
     await handleSellStock(stockWalletId, stockId, quantity);
+  };
+
+  // Supprimer un stock du wallet (NOUVEL ENDPOINT)
+  const handleDeleteStock = async (stockId: number) => {
+    try {
+      const response = await fetch(`${STOCK_WALLET_API_URL}/${stockId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        setTradeMessage({ type: 'success', message: 'Stock supprimé du portefeuille' });
+        await fetchData();
+      } else {
+        setTradeMessage({ type: 'error', message: 'Erreur lors de la suppression' });
+      }
+    } catch (err) {
+      setTradeMessage({ type: 'error', message: 'Erreur lors de la suppression' });
+      console.error('Error deleting stock:', err);
+    }
   };
 
   // Calculer le profit/pertes
@@ -297,19 +308,19 @@ const StockWallet: React.FC = () => {
 
                 <div className="flex justify-between items-center text-sm">
                   <div>
-                    <p className="text-blue-200">Client ID</p>
-                    <p className="font-mono">{clientId}</p>
-                  </div>
-                  <div className="text-right">
                     <p className="text-blue-200">Actions</p>
                     <p className="font-bold">{stockWallet.length}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-blue-200">Statut</p>
+                    <p className="font-bold">Connecté</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Statistiques du Wallet */}
-            {walletStats && (
+            {walletStats ? (
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
@@ -341,6 +352,13 @@ const StockWallet: React.FC = () => {
                       )} €
                     </span>
                   </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-slate-800 border-slate-700">
+                <CardContent className="text-center py-8">
+                  <BarChart3 className="w-8 h-8 mx-auto mb-2 text-slate-500" />
+                  <p className="text-slate-400">Chargement des statistiques...</p>
                 </CardContent>
               </Card>
             )}
@@ -480,12 +498,12 @@ const StockWallet: React.FC = () => {
                           </div>
                         </CardContent>
 
-                        <CardFooter className="pt-0">
+                        <CardFooter className="flex gap-2 pt-0">
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button 
                                 variant="outline" 
-                                className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                                className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
                               >
                                 <DollarSign className="w-4 h-4 mr-2" />
                                 Vendre
@@ -566,6 +584,14 @@ const StockWallet: React.FC = () => {
                               </div>
                             </DialogContent>
                           </Dialog>
+
+                          <Button 
+                            variant="outline" 
+                            className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                            onClick={() => handleDeleteStock(stock.id)}
+                          >
+                            Supprimer
+                          </Button>
                         </CardFooter>
                       </Card>
                     );
