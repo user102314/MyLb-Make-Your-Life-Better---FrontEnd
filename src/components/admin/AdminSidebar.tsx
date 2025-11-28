@@ -87,7 +87,7 @@ const adminNavItems = [
         icon: Settings, 
         links: [
             { name: "Send Email ", path: "AdminEmailSender", icon: MessageSquare },
-            { name: "Support Technique", path: "admin-support", icon: MessageSquare },
+            { name: "Support Technique", path: "AdminMessaging", icon: MessageSquare },
         ]
     }
 ];

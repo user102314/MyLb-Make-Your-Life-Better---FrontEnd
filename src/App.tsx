@@ -49,6 +49,7 @@ import AllCompaniesPage from "./pages/admin/AllCompaniesPage";
 import AllUsersPage from "./pages/admin/AllUsersPage";
 import AdminEmailSender from "./pages/admin/AdminEmailSender";
 import SystemSettingsPage from "./pages/SystemSettingsPage";
+import AdminMessaging from "./pages/admin/AdminMessaging";
 
 
 
@@ -118,6 +119,7 @@ const App = () => (
              <Route path="dashboard" element={<AdminDashboard />} />
              <Route path="AllUsersPage" element={<AllUsersPage />} />
              <Route path="settings" element={<SystemSettingsPage />} />
+             <Route path="AdminMessaging" element={<AdminMessaging />} />
              <Route path="AdminEmailSender" element={<AdminEmailSender />} />
           </Route>
 
