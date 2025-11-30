@@ -720,9 +720,9 @@ const UserDetailsView: React.FC<{
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-purple-500/20 text-white">
-                  <SelectItem value="USER">Utilisateur</SelectItem>
-                  <SelectItem value="ADMIN">Administrateur</SelectItem>
-                  <SelectItem value="MODERATOR">Modérateur</SelectItem>
+                  <SelectItem value="CIVIL">CIVIL</SelectItem>
+                  <SelectItem value="INVESTOR">INVESTOR</SelectItem>
+                  <SelectItem value="OWNER">OWNER</SelectItem>
                 </SelectContent>
               </Select>
             </div>

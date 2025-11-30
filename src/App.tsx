@@ -50,6 +50,7 @@ import AllUsersPage from "./pages/admin/AllUsersPage";
 import AdminEmailSender from "./pages/admin/AdminEmailSender";
 import SystemSettingsPage from "./pages/SystemSettingsPage";
 import AdminMessaging from "./pages/admin/AdminMessaging";
+import Accueil from "./pages/aceuil";
 
 
 
@@ -103,6 +104,7 @@ const App = () => (
              <Route path="BestSales" element={<BestSales />} />
              <Route path="notification" element={<Notifications />} />
              <Route path="AnalysisPage" element={<AnalysisPage />} />
+             <Route path="Accueil" element={<Accueil />} />
              <Route path="CheckTechniqueByAIPage" element={<CheckTechniqueByAIPage />} />
 
           </Route>

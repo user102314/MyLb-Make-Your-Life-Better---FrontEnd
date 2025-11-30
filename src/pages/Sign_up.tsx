@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +33,7 @@ const isPasswordSecure = (password: string): { isValid: boolean, error: string |
 
 const Signup = () => {
     const navigate = useNavigate();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -46,6 +47,85 @@ const Signup = () => {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     
     const passwordValidation = isPasswordSecure(password);
+
+    // Animation 3D Bitcoin avec particules
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            x: number;
+            y: number;
+            size: number;
+            speedX: number;
+            speedY: number;
+            color: string;
+
+            constructor() {
+                this.x = Math.random() * canvas!.width;
+                this.y = Math.random() * canvas!.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, 255, ${Math.random() * 0.5 + 0.2})`;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas!.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas!.width;
+                if (this.y > canvas!.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas!.height;
+            }
+
+            draw() {
+                if (!ctx) return;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const particles: Particle[] = [];
+        for (let i = 0; i < 150; i++) {
+            particles.push(new Particle());
+        }
+
+        const animate = () => {
+            if (!ctx || !canvas) return;
+            
+            ctx.fillStyle = 'rgba(10, 14, 23, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+
+        const handleResize = () => {
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -118,128 +198,267 @@ const Signup = () => {
         }
     };
 
-    // Render component
     return (
-        // Le conteneur principal gère le min-h-screen et le flex-col pour empiler le contenu et le footer
-        <div className="min-h-screen flex flex-col relative overflow-hidden circuit-lines">
+        <div className="min-h-screen flex flex-col relative overflow-hidden">
             
-            {/* Arrière-plan et effets visuels */}
-            <div className="absolute inset-0 gradient-hero"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl max-h-2xl bg-primary/10 rounded-full blur-[120px]"></div>
+            {/* Canvas pour l'animation des particules */}
+            <canvas 
+                ref={canvasRef}
+                className="absolute inset-0 z-0"
+                style={{ background: 'linear-gradient(135deg, #0a0e17 0%, #1a1f2e 50%, #0a0e17 100%)' }}
+            />
 
-            {/* Contenu principal (Formulaire) - Flex grow pour prendre l'espace disponible */}
-            <main className="flex-grow flex items-center justify-center relative z-10 w-full px-4 sm:px-6 py-8"> {/* Ajout de px pour la réactivité, py pour l'espace minimal */}
-                <div className="w-full max-w-md">
-                    <div className="gradient-card rounded-2xl border border-primary/20 p-8 shadow-[0_0_60px_hsla(189,100%,50%,0.15)]">
-                        <div className="text-center mb-6">
-                            <Link to="/" className="inline-block">
-                                <div className="text-4xl font-bold mb-2">
+            {/* Bitcoin 3D Icon Flottant */}
+            <div className="absolute top-1/4 left-10 z-10 hidden lg:block">
+                <div className="relative w-32 h-32">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full 
+                                    animate-pulse shadow-2xl shadow-purple-500/50 rotate-0 hover:rotate-180 
+                                    transition-transform duration-1000">
+                        <div className="absolute inset-2 bg-[#0a0e17] rounded-full flex items-center justify-center">
+                            <div className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                ₿
+                            </div>
+                        </div>
+                    </div>
+                    {/* Effet de glow animé */}
+                    <div className="absolute -inset-4 bg-gradient-to-r from-purple-400 to-blue-500 rounded-full 
+                                    opacity-20 blur-xl animate-pulse"></div>
+                </div>
+            </div>
+
+            {/* Points lumineux décoratifs */}
+            <div className="absolute top-20 right-10 w-4 h-4 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/50"></div>
+            <div className="absolute bottom-40 right-20 w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-lg shadow-blue-500/50"></div>
+            <div className="absolute top-60 left-20 w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
+
+            {/* Contenu principal */}
+            <main className="flex-grow flex items-center justify-center relative z-10 w-full px-4 sm:px-6 py-8">
+                
+                {/* Grille animée en arrière-plan */}
+                <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(120,119,198,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(120,119,198,0.3)_1px,transparent_1px)] bg-[size:70px_70px] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+                
+                <div className="w-full max-w-2xl">
+                    <div className="relative rounded-2xl border border-primary/30 p-8 shadow-2xl bg-card/95 backdrop-blur-xl
+                                     shadow-[0_0_100px_rgba(147,51,234,0.3),_0_0_40px_rgba(59,130,246,0.4)]
+                                     overflow-hidden">
+                        
+                        {/* Effet de bordure animée */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-600/10 rounded-2xl 
+                                        animate-gradient-x"></div>
+                    
+                        <div className="text-center mb-8 relative z-10">
+                            <Link to="/" className="inline-block transform hover:scale-105 transition-transform duration-300">
+                                <div className="text-5xl font-extrabold tracking-tighter mb-2">
                                     <span className="text-foreground">My</span>
-                                    <span className="text-primary glow-text">LB</span>
+                                    <span className="text-primary glow-text animate-pulse">LB</span>
                                 </div>
                             </Link>
-                            <p className="text-muted-foreground text-sm">Créez votre compte</p>
+                            <p className="text-muted-foreground mt-1 text-base font-light">
+                                Rejoignez la révolution financière tunisienne
+                            </p>
                         </div>
 
-                        {/* API Message Display */}
+                        {/* Message Display amélioré */}
                         {message && (
-                            <div className={`p-3 mb-4 rounded-lg text-sm ${message.type === 'success' ? 'bg-green-600/70 text-white' : 'bg-red-600/70 text-white'}`}>
-                                {message.text}
+                            <div className={`p-4 mb-6 rounded-xl text-sm font-medium relative overflow-hidden ${
+                                message.type === 'success' 
+                                    ? 'bg-green-600/20 text-green-300 border border-green-700/50' 
+                                    : 'bg-red-600/20 text-red-300 border border-red-700/50'
+                            }`}>
+                                <div className={`absolute inset-0 ${
+                                    message.type === 'success' 
+                                        ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10' 
+                                        : 'bg-gradient-to-r from-red-500/10 to-pink-500/10'
+                                }`}></div>
+                                <span className="relative z-10">{message.text}</span>
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label>Nom</Label>
-                                    <Input value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={loading} />
+                        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-3">
+                                    <Label className="text-foreground font-semibold flex items-center">
+                                        <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                            Nom
+                                        </span>
+                                    </Label>
+                                    <Input 
+                                        value={lastName} 
+                                        onChange={(e) => setLastName(e.target.value)} 
+                                        required 
+                                        disabled={loading}
+                                        className="border-border/50 bg-background/80 focus:border-primary/80 
+                                                   transition-all duration-300 backdrop-blur-sm h-12
+                                                   focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                                    />
                                 </div>
-                                <div>
-                                    <Label>Prénom</Label>
-                                    <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={loading} />
+                                <div className="space-y-3">
+                                    <Label className="text-foreground font-semibold flex items-center">
+                                        <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                            Prénom
+                                        </span>
+                                    </Label>
+                                    <Input 
+                                        value={firstName} 
+                                        onChange={(e) => setFirstName(e.target.value)} 
+                                        required 
+                                        disabled={loading}
+                                        className="border-border/50 bg-background/80 focus:border-primary/80 
+                                                   transition-all duration-300 backdrop-blur-sm h-12
+                                                   focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                                    />
                                 </div>
                             </div>
 
-                            <div>
-                                <Label>Date de Naissance</Label>
+                            <div className="space-y-3">
+                                <Label className="text-foreground font-semibold flex items-center">
+                                    <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                        Date de Naissance
+                                    </span>
+                                </Label>
                                 <Input 
                                     type="date" 
                                     value={birthDate} 
                                     onChange={(e)=>setBirthDate(e.target.value)} 
                                     required 
                                     disabled={loading}
-                                    max={new Date().toISOString().split("T")[0]} 
+                                    max={new Date().toISOString().split("T")[0]}
+                                    className="border-border/50 bg-background/80 focus:border-primary/80 
+                                               transition-all duration-300 backdrop-blur-sm h-12
+                                               focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
                                 />
                             </div>
 
-                            <div>
-                                <Label htmlFor="profile-image">Image de Profil</Label>
+                            <div className="space-y-3">
+                                <Label htmlFor="profile-image" className="text-foreground font-semibold flex items-center">
+                                    <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                        Image de Profil
+                                    </span>
+                                </Label>
                                 <Input
                                     id="profile-image"
                                     type="file"
                                     accept="image/*"
                                     onChange={handleFileChange}
-                                    className="file:text-sm file:font-semibold file:bg-primary/10 file:text-primary file:border-0 hover:file:bg-primary/20"
+                                    className="file:text-sm file:font-semibold file:bg-primary/10 file:text-primary file:border-0 hover:file:bg-primary/20
+                                               border-border/50 bg-background/80 transition-all duration-300 backdrop-blur-sm h-12"
                                     required
                                     disabled={loading}
                                 />
-                                {profileImage && <p className="text-xs text-muted-foreground mt-1">Fichier sélectionné : {profileImage.name}</p>}
+                                {profileImage && (
+                                    <p className="text-xs text-muted-foreground mt-2 bg-background/50 p-2 rounded border border-border/70">
+                                        📸 Fichier sélectionné : {profileImage.name}
+                                    </p>
+                                )}
                             </div>
                             
-                            <div>
-                                <Label>Email</Label>
-                                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
+                            <div className="space-y-3">
+                                <Label className="text-foreground font-semibold flex items-center">
+                                    <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                        Email
+                                    </span>
+                                </Label>
+                                <Input 
+                                    type="email" 
+                                    value={email} 
+                                    onChange={(e) => setEmail(e.target.value)} 
+                                    required 
+                                    disabled={loading}
+                                    className="border-border/50 bg-background/80 focus:border-primary/80 
+                                               transition-all duration-300 backdrop-blur-sm h-12
+                                               focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                                />
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Mot de Passe</Label>
-                                <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
+                            <div className="space-y-3">
+                                <Label className="text-foreground font-semibold flex items-center">
+                                    <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                        Mot de Passe
+                                    </span>
+                                </Label>
+                                <Input 
+                                    type="password" 
+                                    value={password} 
+                                    onChange={(e) => setPassword(e.target.value)} 
+                                    required 
+                                    disabled={loading}
+                                    className="border-border/50 bg-background/80 focus:border-primary/80 
+                                               transition-all duration-300 backdrop-blur-sm h-12
+                                               focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                                />
                                 
                                 {password.length > 0 && (
-                                    <ul className="text-xs space-y-1 p-2 bg-background/50 rounded border border-border/70">
-                                        <li className={password.length >= 8 ? "text-green-500" : "text-red-500"}>
-                                            {password.length >= 8 ? '✓' : '✗'} 8 caractères minimum
-                                        </li>
-                                        <li className={/[A-Z]/.test(password) ? "text-green-500" : "text-red-500"}>
-                                            {/[A-Z]/.test(password) ? '✓' : '✗'} Au moins une Majuscule
-                                        </li>
-                                        <li className={/[a-z]/.test(password) ? "text-green-500" : "text-red-500"}>
-                                            {/[a-z]/.test(password) ? '✓' : '✗'} Au moins une Minuscule
-                                        </li>
-                                        <li className={/[0-9]/.test(password) ? "text-green-500" : "text-red-500"}>
-                                            {/[0-9]/.test(password) ? '✓' : '✗'} Au moins un Chiffre
-                                        </li>
-                                        <li className={/[^a-zA-Z0-9\s]/.test(password) ? "text-green-500" : "text-red-500"}>
-                                            {/[^a-zA-Z0-9\s]/.test(password) ? '✓' : '✗'} Au moins un Caractère Spécial
-                                        </li>
-                                    </ul>
+                                    <div className="p-4 bg-background/50 rounded-xl border border-border/70 backdrop-blur-sm">
+                                        <ul className="text-xs space-y-2">
+                                            {[
+                                                { condition: password.length >= 8, text: '8 caractères minimum' },
+                                                { condition: /[A-Z]/.test(password), text: 'Au moins une Majuscule' },
+                                                { condition: /[a-z]/.test(password), text: 'Au moins une Minuscule' },
+                                                { condition: /[0-9]/.test(password), text: 'Au moins un Chiffre' },
+                                                { condition: /[^a-zA-Z0-9\s]/.test(password), text: 'Au moins un Caractère Spécial' }
+                                            ].map((item, index) => (
+                                                <li key={index} className={`flex items-center ${item.condition ? "text-green-400" : "text-red-400"}`}>
+                                                    <span className="mr-2">{item.condition ? '✓' : '✗'}</span>
+                                                    {item.text}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Confirmer le Mot de Passe</Label>
-                                <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} />
+                            <div className="space-y-3">
+                                <Label className="text-foreground font-semibold flex items-center">
+                                    <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                                        Confirmer le Mot de Passe
+                                    </span>
+                                </Label>
+                                <Input 
+                                    type="password" 
+                                    value={confirmPassword} 
+                                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                                    required 
+                                    disabled={loading}
+                                    className="border-border/50 bg-background/80 focus:border-primary/80 
+                                               transition-all duration-300 backdrop-blur-sm h-12
+                                               focus:shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                                />
                                 {confirmPassword && password && password !== confirmPassword && (
-                                    <p className="text-sm text-red-500">Les mots de passe ne correspondent pas.</p>
+                                    <p className="text-sm text-red-400 bg-red-500/10 p-2 rounded border border-red-500/30">
+                                        ⚠️ Les mots de passe ne correspondent pas.
+                                    </p>
                                 )}
                             </div>
 
                             <Button
                                 type="submit"
                                 disabled={loading || !passwordValidation.isValid || password !== confirmPassword}
-                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-6 glow-border transition-all duration-300 hover:shadow-[0_0_50px_hsla(189,100%,50%,0.5)]"
+                                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-primary-foreground 
+                                         hover:from-purple-700 hover:to-blue-700 font-bold py-6 text-lg tracking-wide 
+                                         shadow-[0_0_30px_hsla(260,100%,50%,0.4)] hover:shadow-[0_0_50px_hsla(260,100%,50%,0.6)] 
+                                         transition-all duration-500 transform hover:scale-[1.02] relative overflow-hidden group"
                             >
+                                {/* Effet de brillance au survol */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent 
+                                                -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] 
+                                                transition-transform duration-1000"></div>
+                                
                                 {loading ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription en cours...</>
+                                    <div className="flex items-center justify-center">
+                                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                                        Inscription en cours...
+                                    </div>
                                 ) : (
-                                    "S'inscrire"
+                                    "Créer mon compte"
                                 )}
                             </Button>
                         </form>
 
-                        <p className="text-center text-sm mt-6 text-muted-foreground">
+                        <p className="text-center text-sm mt-6 text-muted-foreground relative z-10">
                             Vous avez déjà un compte ?{" "}
-                            <Link to="/login" className="text-primary glow-text hover:underline">
+                            <Link to="/login" className="text-primary glow-text hover:underline transition-all duration-300
+                                                       bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent
+                                                       hover:from-purple-300 hover:to-blue-400">
                                 Se connecter
                             </Link>
                         </p>
@@ -247,12 +466,16 @@ const Signup = () => {
                 </div>
             </main>
 
-            {/* Footer - Reste fixe en bas */}
-            <footer className="w-full p-4 text-center text-xs text-muted-foreground/70 bg-background/50 border-t border-border/50 backdrop-blur-sm z-20">
-                &copy; {new Date().getFullYear()} MyLB. Tous droits réservés. | 
-                <Link to="/terms" className="hover:text-primary transition-colors ml-1 underline-offset-4 hover:underline">Conditions Générales</Link>
+            {/* Footer amélioré */}
+            <footer className="w-full p-4 text-center text-xs text-muted-foreground/70 bg-background/80 border-t border-border/50 backdrop-blur-sm z-20 relative">
+                <div className="container mx-auto">
+                    &copy; {new Date().getFullYear()} MyLB. Tous droits réservés. | 
+                    <Link to="/terms" className="hover:text-primary transition-colors duration-300 ml-1 underline-offset-4 hover:underline
+                                               bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                        Conditions Générales
+                    </Link>
+                </div>
             </footer>
-
         </div>
     );
 };

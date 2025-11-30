@@ -171,3 +171,4 @@ Le seul problème restant est la redondance du `@SendTo("/topic/admin")` dans le
 La sécurité est améliorée car le backend extrait l'ID depuis la session WebSocket plutôt que de faire confiance au message du client.
 
 
+

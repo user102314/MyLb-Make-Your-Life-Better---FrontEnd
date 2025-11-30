@@ -127,13 +127,11 @@ const AdminMessaging: React.FC = () => {
                 // S'abonner à la queue admin spécifique
                 client.subscribe('/queue/admin', (message) => {
                     try {
-                        console.log('📨 Message brut reçu sur /queue/admin:', message.body);
+                        console.log('📨 Message reçu sur /queue/admin:', message.body);
                         const messageData = JSON.parse(message.body);
-                        console.log('📨 Message parsé:', messageData);
                         handleIncomingMessage(messageData);
                     } catch (error) {
-                        console.error('❌ Erreur parsing message STOMP:', error);
-                        console.error('❌ Message body:', message.body);
+                        console.error('Erreur parsing message STOMP:', error);
                     }
                 });
 
@@ -206,17 +204,11 @@ const AdminMessaging: React.FC = () => {
     };
 
     const handleIncomingMessage = (messageData: any) => {
-        console.log('📨 Message entrant reçu:', messageData);
-        
         // Adapter le format du backend (sendFrom, message) au format frontend
-        const senderId = Number(messageData.sendFrom || messageData.senderId);
+        const senderId = messageData.sendFrom || messageData.senderId;
         const content = messageData.message || messageData.content;
 
-        console.log(`🔍 Vérification: senderId=${senderId}, adminId=${adminId}, senderId !== adminId = ${senderId !== adminId}`);
-
-        // Vérifier que le message vient d'un utilisateur (pas de l'admin)
         if (content && senderId && senderId !== adminId) {
-            console.log('✅ Message accepté - vient d\'un utilisateur');
             const adaptedMessage = {
                 ...messageData,
                 senderId: senderId,
@@ -224,8 +216,6 @@ const AdminMessaging: React.FC = () => {
                 timestamp: messageData.date || messageData.timestamp || new Date().toISOString()
             };
             handleNewMessage(adaptedMessage);
-        } else {
-            console.log('⚠️ Message ignoré - conditions non remplies');
         }
     };
 
@@ -257,40 +247,20 @@ const AdminMessaging: React.FC = () => {
     };
 
     const handleNewMessage = (messageData: any) => {
-        console.log('📝 Création nouveau message depuis handleNewMessage:', messageData);
-        
         const newMessage: Message = {
             id: messageData.id || Date.now(),
-            content: messageData.content || messageData.message,
-            sender: 'user', // Les messages entrants viennent toujours des utilisateurs
-            timestamp: new Date(messageData.timestamp || messageData.date || Date.now()).toLocaleTimeString('fr-FR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            }),
+            content: messageData.content,
+            sender: 'user',
+            timestamp: new Date(messageData.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
             isRead: false,
             type: 'text',
-            senderId: Number(messageData.senderId || messageData.sendFrom),
+            senderId: messageData.senderId,
             receiverId: adminId
         };
 
-        console.log('✅ Nouveau message créé:', newMessage);
-        console.log('🔍 Conversation sélectionnée:', selectedConversation?.userId);
-        console.log('🔍 Sender ID du message:', newMessage.senderId);
-
         // Ajouter le message à la liste si c'est la conversation sélectionnée
-        if (selectedConversation?.userId === newMessage.senderId) {
-            console.log('✅ Ajout du message à la liste (conversation sélectionnée)');
-            setMessages(prev => {
-                // Vérifier que le message n'existe pas déjà
-                const exists = prev.some(m => m.id === newMessage.id);
-                if (exists) {
-                    console.log('⚠️ Message déjà présent, ignoré');
-                    return prev;
-                }
-                return [...prev, newMessage];
-            });
-        } else {
-            console.log('⚠️ Message non ajouté - conversation non sélectionnée ou userId différent');
+        if (selectedConversation?.userId === messageData.senderId) {
+            setMessages(prev => [...prev, newMessage]);
         }
 
         // Mettre à jour ou créer la conversation
@@ -410,37 +380,34 @@ const AdminMessaging: React.FC = () => {
                 console.log('📥 Messages reçus depuis l\'API:', messageDTOs);
                 console.log('🔍 Admin ID utilisé pour comparaison:', adminId);
                 
-                // Créer un tableau avec les dates pour le tri
-                const messagesWithDates = messageDTOs.map((msg: any) => {
+                const formattedMessages: Message[] = messageDTOs.map((msg: any) => {
+                    // Convertir en nombre pour comparaison correcte
                     const sendFromNum = Number(msg.sendFrom || msg.senderId);
                     const isFromAdmin = sendFromNum === adminId;
-                    const messageDate = new Date(msg.date || msg.timestamp);
                     
-                    console.log(`📨 Message ID ${msg.id}: sendFrom=${sendFromNum}, adminId=${adminId}, isFromAdmin=${isFromAdmin}, date=${messageDate}`);
+                    console.log(`📨 Message ID ${msg.id}: sendFrom=${sendFromNum}, adminId=${adminId}, isFromAdmin=${isFromAdmin}`);
                     
                     return {
-                        message: {
-                            id: msg.id,
-                            content: msg.message || msg.content,
-                            sender: isFromAdmin ? 'admin' : 'user',
-                            timestamp: messageDate.toLocaleTimeString('fr-FR', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }),
-                            isRead: msg.isRead || false,
-                            type: 'text' as const,
-                            senderId: sendFromNum,
-                            receiverId: Number(msg.sendTo || msg.receiverId)
-                        },
-                        date: messageDate
+                        id: msg.id,
+                        content: msg.message || msg.content,
+                        sender: isFromAdmin ? 'admin' : 'user',
+                        timestamp: new Date(msg.date || msg.timestamp).toLocaleTimeString('fr-FR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }),
+                        isRead: msg.isRead || false,
+                        type: 'text',
+                        senderId: sendFromNum,
+                        receiverId: Number(msg.sendTo || msg.receiverId)
                     };
                 });
 
                 // Trier les messages par date (plus ancien en premier)
-                messagesWithDates.sort((a, b) => a.date.getTime() - b.date.getTime());
-
-                // Extraire uniquement les messages
-                const formattedMessages: Message[] = messagesWithDates.map(item => item.message);
+                formattedMessages.sort((a, b) => {
+                    const dateA = new Date(messageDTOs.find((m: any) => m.id === a.id)?.date || 0);
+                    const dateB = new Date(messageDTOs.find((m: any) => m.id === b.id)?.date || 0);
+                    return dateA.getTime() - dateB.getTime();
+                });
 
                 console.log('✅ Messages formatés et triés:', formattedMessages);
                 setMessages(formattedMessages);

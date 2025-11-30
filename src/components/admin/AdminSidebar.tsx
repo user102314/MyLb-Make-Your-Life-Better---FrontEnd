@@ -62,7 +62,8 @@ const adminNavItems = [
         links: [
             { name: "Vue Générale", path: "dashboard", icon: Zap },
             { name: "Tout les utilisatuers", path: "AllUsersPage", icon: Users },
-            { name: "Toutes les Sociétés", path: "AdminCompony", icon: Building },
+            { name: "Validation Sociétés", path: "company-application", icon: Landmark },
+
             { name: "Toutes les Actions", path: "market", icon: TrendingUp },
         ]
     },
@@ -70,7 +71,7 @@ const adminNavItems = [
         title: "Applications & Validation", 
         icon: CheckCircle, 
         links: [
-            { name: "Validation Sociétés", path: "company-application", icon: Landmark },
+            { name: "Toutes les Sociétés", path: "AdminCompony", icon: Building },
             { name: "Validation Identité", path: "AdminVerifyUser", icon: Fingerprint },
         ]
     },

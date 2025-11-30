@@ -4,7 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
     User, Lock, Shield, Settings, TrendingUp, Zap, CreditCard, 
     DollarSign, LogOut, MessageSquare, Briefcase, ListTodo, Sliders, 
-    Building, PlusCircle
+    Building, PlusCircle,
+    Podcast
 } from 'lucide-react';
 
 // --- Hook d'authentification pour Sidebar ---
@@ -56,9 +57,14 @@ const useSidebarAuth = () => {
 
 // --- Sidebar Navigation Data ---
 const navItems = [
+    { title: "Accueil Section", icon: Podcast, links: [
+        { name: "Add Post", path: "Editprofile", icon: Settings },
+        { name: "View All Posts", path: "Accueil", icon: Settings },
+
+      
+    ]},
     { title: "Profile Section", icon: User, links: [
         { name: "View Profile", path: "profile", icon: User },
-        { name: "Modify Profile", path: "Editprofile", icon: Settings },
         { name: "Modify Password", path: "PasswordChange", icon: Lock },
         { name: "Verify Account", path: "verify", icon: ListTodo }
     ]},

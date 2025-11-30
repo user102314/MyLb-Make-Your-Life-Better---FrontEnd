@@ -98,7 +98,7 @@ const StatisticsPage: React.FC = () => {
     setLoading(true);
     try {
       // Charger les transactions
-      const transactionsResponse = await fetch(`${API_TRANSACTIONS_URL}/client/${clientId}`, {
+      const transactionsResponse = await fetch(`${API_TRANSACTIONS_URL}`, {
         credentials: 'include'
       });
       
@@ -109,7 +109,7 @@ const StatisticsPage: React.FC = () => {
       }
 
       // Charger les statistiques
-      const statsResponse = await fetch(`${API_TRANSACTIONS_URL}/client/${clientId}/stats`, {
+      const statsResponse = await fetch(`${API_TRANSACTIONS_URL}/stats`, {
         credentials: 'include'
       });
       
@@ -119,7 +119,7 @@ const StatisticsPage: React.FC = () => {
       }
 
       // Charger le solde du wallet
-      const walletResponse = await fetch(`${API_WALLET_URL}/${clientId}/solde`, {
+      const walletResponse = await fetch(`${API_WALLET_URL}/solde`, {
         credentials: 'include'
       });
       
